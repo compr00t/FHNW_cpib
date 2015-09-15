@@ -1,1 +1,1 @@
-# FHNW_cpib
+# FHNW Modul "cpib - Compilerbau"
