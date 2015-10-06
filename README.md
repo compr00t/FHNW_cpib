@@ -1,2 +1,4 @@
-# FHNW Modul "cpib - Compilerbau" von Manuel Fluri und Patrick Schmid
+# FHNW Modul "cpib - Compilerbau" 
+
+von Manuel Fluri und Patrick Schmid
 Erweiterung: Arrays
