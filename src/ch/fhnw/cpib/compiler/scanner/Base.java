@@ -1,6 +1,6 @@
 package ch.fhnw.cpib.compiler.scanner;
 
-static class Base {
+class Base {
     private final Terminals terminal;
 
     Base(Terminals t) {
