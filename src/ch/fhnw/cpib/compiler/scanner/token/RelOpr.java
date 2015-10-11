@@ -7,7 +7,7 @@ public class RelOpr extends BaseToken {
 
 private final Operator value;
     
-    RelOpr(Operator v) {
+    public RelOpr(Operator v) {
         super(Terminals.RELOPR);
         value = v;
     }

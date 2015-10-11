@@ -6,7 +6,7 @@ public class Literal extends BaseToken {
 
     private final int value;
     
-    Literal(int v) {
+    public Literal(int v) {
         super(Terminals.LITERAL);
         value = v;
     }

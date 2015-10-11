@@ -6,7 +6,7 @@ public class Ident extends BaseToken {
 
 private final String value;
     
-    Ident(String i) {
+    public Ident(String i) {
         super(Terminals.IDENT);
         value = i;
     }
