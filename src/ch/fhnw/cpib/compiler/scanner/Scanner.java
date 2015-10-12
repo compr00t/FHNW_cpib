@@ -27,7 +27,8 @@ public class Scanner {
 
         while ((currentLine = inBuffer.readLine()) != null) {
             lineNumber++;
-
+            charNumber = 0;
+            
             for (int i = 0; i < currentLine.length(); i++) {
                 charNumber++;
                 scanChar(currentLine.charAt(i), lineNumber, charNumber);
@@ -42,7 +43,7 @@ public class Scanner {
 
         switch (currentState) {
         case INITIALSTATE:
-
+            
             if ('0' <= c && c <= '9') {
                 currentState = State.LITERALSTATE;
                 tmpHolder = "" + c;
@@ -68,12 +69,12 @@ public class Scanner {
             }else if ((' ' == c) || ('\t' == c) || ('\n' == c) || (ScannerSymbols.contains((int) c))) {
                 IToken token = new Literal(Integer.parseInt(tmpHolder));
                 tokenList.add(token);
-                tmpHolder = null;
+                tmpHolder = "";
                 currentState = State.INITIALSTATE;
             }else if (ScannerSymbols.contains((int) c) || '\u0003' == c) {
                 IToken token = new Literal(Integer.parseInt(tmpHolder));
                 tokenList.add(token);
-                tmpHolder = null;
+                tmpHolder = "";
                 currentState = State.INITIALSTATE;
                 this.scanChar(c, lineNumber, charNumber);
             } else {
@@ -92,7 +93,7 @@ public class Scanner {
                 }else{
                     tokenList.add(token);
                 }
-                tmpHolder = null;
+                tmpHolder = "";
                 currentState = State.INITIALSTATE;
             }else if (ScannerSymbols.contains((int) c) || '\u0003' == c) {
                 IToken token = scanKeyword(tmpHolder);
@@ -101,7 +102,7 @@ public class Scanner {
                 }else{
                     tokenList.add(token);
                 }
-                tmpHolder = null;
+                tmpHolder = "";
                 currentState = State.INITIALSTATE;
                 this.scanChar(c, lineNumber, charNumber);
             } else {
@@ -121,14 +122,22 @@ public class Scanner {
                         tokenList.add(tokenA);
                         IToken tokenB = findSymbol(")");
                         tokenList.add(tokenB);
-                        tmpHolder = null;
+                        tmpHolder = "";
                         currentState = State.INITIALSTATE;
                         this.scanChar(c, lineNumber, charNumber);
+                    }else if(tmpHolder.equals(");")){
+                            IToken tokenA = findSymbol(")");
+                            tokenList.add(tokenA);
+                            IToken tokenB = findSymbol(";");
+                            tokenList.add(tokenB);
+                            tmpHolder = "";
+                            currentState = State.INITIALSTATE;
+                            this.scanChar(c, lineNumber, charNumber);
                     }else{
                         IToken token = findSymbol(tmpHolder);
                         if (token != null) {
                             tokenList.add(token);
-                            tmpHolder = null;
+                            tmpHolder = "";
                             currentState = State.INITIALSTATE;
                             this.scanChar(c, lineNumber, charNumber);
                         } else {
@@ -138,7 +147,7 @@ public class Scanner {
                 } else {
                     throw new LexicalError("Illegal length of a Symbol at " + charNumber + ": " + c, lineNumber);
                 }
-                tmpHolder = null;
+                tmpHolder = "";
             } else if ('\u0003' == c) {
 
             } else {
