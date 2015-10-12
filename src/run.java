@@ -35,9 +35,12 @@ public class run {
         Scanner scanner = new Scanner();
         try {
             tokenList = scanner.scan(new BufferedReader(new StringReader(program.toString())));
+            
         } catch(Exception e) {
             System.out.println("ERROR! " + e.getMessage());
         }
+        
+        System.out.println(tokenList.toString());
         
     }
 }

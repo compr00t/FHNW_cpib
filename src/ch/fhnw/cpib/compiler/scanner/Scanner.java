@@ -35,7 +35,7 @@ public class Scanner {
 
         }
 
-        return null;
+        return tokenList;
     }
 
     private void scanChar(char c, int lineNumber, int charNumber) throws LexicalError {
@@ -87,12 +87,20 @@ public class Scanner {
                 tmpHolder += c;
             }else if ((' ' == c) || ('\t' == c) || ('\n' == c)) {
                 IToken token = scanKeyword(tmpHolder);
-                tokenList.add(token);
+                if(token==null){
+                    tokenList.add(new Ident(tmpHolder));
+                }else{
+                    tokenList.add(token);
+                }
                 tmpHolder = null;
                 currentState = State.INITIALSTATE;
             }else if (ScannerSymbols.contains((int) c) || '\u0003' == c) {
                 IToken token = scanKeyword(tmpHolder);
-                tokenList.add(token);
+                if(token==null){
+                    tokenList.add(new Ident(tmpHolder));
+                }else{
+                    tokenList.add(token);
+                }
                 tmpHolder = null;
                 currentState = State.INITIALSTATE;
                 this.scanChar(c, lineNumber, charNumber);
