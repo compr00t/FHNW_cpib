@@ -6,7 +6,6 @@ import java.io.IOException;
 import ch.fhnw.cpib.compiler.scanner.exception.LexicalError;
 import ch.fhnw.cpib.compiler.scanner.enums.*;
 import ch.fhnw.cpib.compiler.scanner.token.*;
-import ch.fhnw.cpib.compiler.scanner.token.Keywords.RParen;
 
 public class Scanner {
     
@@ -119,7 +118,7 @@ public class Scanner {
             }
             if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || (' ' == c) || ('\t' == c) || ('\n' == c)) {
                 if(tmpHolder.length()>=1){
-                    IToken token = findKeyword(tmpHolder);
+                    IToken token = findSymbol(tmpHolder);
                     if(token!=null){
                         tokenList.add(token);
                         tmpHolder = null;
@@ -148,23 +147,23 @@ public class Scanner {
         }
     }
     
-    private Keywords findKeyword(String s){
+    private BaseToken findSymbol(String s){
         if(s.length() == 1){
             switch(s){
             case("("):
-                return new Keywords.LParen();
+                return new Symbol.LParen();
             case(")"):
-                return new Keywords.RParen();
+                return new Symbol.RParen();
             case("{"):
                 return null;
             case("}"):
                 return null;
             case(","):
-                return new Keywords.Comma();
+                return new Symbol.Comma();
             case(":"):
-                return new Keywords.Colon();
+                return new Symbol.Colon();
             case(";"):
-                break;
+                return new Symbol.Semicolon();
             case("="):
                 break;
             case("*"):

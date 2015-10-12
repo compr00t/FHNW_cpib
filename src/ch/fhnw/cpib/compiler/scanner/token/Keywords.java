@@ -28,31 +28,5 @@ public abstract class Keywords extends BaseToken {
         } 
     }
     
-    public static class RParen extends Keywords {
-
-        public RParen() {
-            super(Terminals.RPAREN);
-        } 
-    }
     
-    public static class LParen extends Keywords {
-
-        public LParen() {
-            super(Terminals.LPAREN);
-        } 
-    }
-    
-    public static class Comma extends Keywords {
-
-        public Comma() {
-            super(Terminals.COMMA);
-        } 
-    }
-    
-    public static class Colon extends Keywords {
-
-        public Colon() {
-            super(Terminals.COLON);
-        } 
-    }
 }

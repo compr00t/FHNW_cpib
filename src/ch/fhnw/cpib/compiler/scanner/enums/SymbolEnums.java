@@ -1,6 +1,6 @@
 package ch.fhnw.cpib.compiler.scanner.enums;
 
-public enum Symbols {
+public enum SymbolEnums {
     
     PLUS("+"), MINUS("-"), TIMES("*"), MOD("%"), DIV("/"),
     
@@ -15,7 +15,7 @@ public enum Symbols {
     
     private String pattern;
     
-    Symbols(String pattern) {
+    SymbolEnums(String pattern) {
         pattern = this.pattern;
     }
 }

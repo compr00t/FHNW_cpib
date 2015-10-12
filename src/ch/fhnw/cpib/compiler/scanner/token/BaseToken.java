@@ -1,7 +1,7 @@
 package ch.fhnw.cpib.compiler.scanner.token;
 
 import ch.fhnw.cpib.compiler.scanner.IToken;
-import ch.fhnw.cpib.compiler.scanner.enums.Terminals;
+import ch.fhnw.cpib.compiler.scanner.enums.*;
 
 public abstract class BaseToken implements IToken {
     private final Terminals terminal;
