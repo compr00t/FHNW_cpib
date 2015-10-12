@@ -28,7 +28,7 @@ public class Scanner {
         while ((currentLine = inBuffer.readLine()) != null) {
             lineNumber++;
             charNumber = 0;
-            
+
             for (int i = 0; i < currentLine.length(); i++) {
                 charNumber++;
                 scanChar(currentLine.charAt(i), lineNumber, charNumber);
@@ -43,19 +43,19 @@ public class Scanner {
 
         switch (currentState) {
         case INITIALSTATE:
-            
+
             if ('0' <= c && c <= '9') {
                 currentState = State.LITERALSTATE;
                 tmpHolder = "" + c;
-            }else if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z')) {
+            } else if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z')) {
                 currentState = State.IDENTIFIERSTATE;
                 tmpHolder = "" + c;
-            }else if (ScannerSymbols.contains((int) c)) {
+            } else if (ScannerSymbols.contains((int) c)) {
                 currentState = State.SYMBOLSTATE;
                 tmpHolder = "" + c;
-            }else if ((' ' == c) || ('\t' == c) || ('\n' == c)) {
+            } else if ((' ' == c) || ('\t' == c) || ('\n' == c) || ('\r' == c)) {
                 currentState = State.INITIALSTATE;
-            }else if ('\u0003' == c) {
+            } else if ('\u0003' == c) {
                 IToken token = new Keywords.Sentinel();
                 tokenList.add(token);
             } else {
@@ -66,12 +66,13 @@ public class Scanner {
         case LITERALSTATE:
             if (('0' <= c && c <= '9')) {
                 tmpHolder += c;
-            }else if ((' ' == c) || ('\t' == c) || ('\n' == c) || (ScannerSymbols.contains((int) c))) {
+            } else if ((' ' == c) || ('\t' == c) || ('\n' == c) || ('\r' == c)) {
                 IToken token = new Literal(Integer.parseInt(tmpHolder));
                 tokenList.add(token);
                 tmpHolder = "";
                 currentState = State.INITIALSTATE;
-            }else if (ScannerSymbols.contains((int) c) || '\u0003' == c) {
+            } else if (ScannerSymbols.contains((int) c) || '\u0003' == c || ('A' <= c && c <= 'Z')
+                    || ('a' <= c && c <= 'z')) {
                 IToken token = new Literal(Integer.parseInt(tmpHolder));
                 tokenList.add(token);
                 tmpHolder = "";
@@ -86,20 +87,20 @@ public class Scanner {
         case IDENTIFIERSTATE:
             if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9')) {
                 tmpHolder += c;
-            }else if ((' ' == c) || ('\t' == c) || ('\n' == c)) {
+            } else if ((' ' == c) || ('\t' == c) || ('\n' == c) || ('\r' == c)) {
                 IToken token = scanKeyword(tmpHolder);
-                if(token==null){
+                if (token == null) {
                     tokenList.add(new Ident(tmpHolder));
-                }else{
+                } else {
                     tokenList.add(token);
                 }
                 tmpHolder = "";
                 currentState = State.INITIALSTATE;
-            }else if (ScannerSymbols.contains((int) c) || '\u0003' == c) {
+            } else if (ScannerSymbols.contains((int) c) || '\u0003' == c) {
                 IToken token = scanKeyword(tmpHolder);
-                if(token==null){
+                if (token == null) {
                     tokenList.add(new Ident(tmpHolder));
-                }else{
+                } else {
                     tokenList.add(token);
                 }
                 tmpHolder = "";
@@ -113,42 +114,58 @@ public class Scanner {
 
         case SYMBOLSTATE:
             if (ScannerSymbols.contains((int) c)) {
-                tmpHolder+=c;
-            } else if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || (' ' == c) || ('\t' == c)
-                    || ('\n' == c)) {
-                if (tmpHolder.length() >= 1) {
-                    if(tmpHolder.equals("()")){
-                        IToken tokenA = findSymbol("(");
-                        tokenList.add(tokenA);
-                        IToken tokenB = findSymbol(")");
-                        tokenList.add(tokenB);
-                        tmpHolder = "";
-                        currentState = State.INITIALSTATE;
-                        this.scanChar(c, lineNumber, charNumber);
-                    }else if(tmpHolder.equals(");")){
-                            IToken tokenA = findSymbol(")");
-                            tokenList.add(tokenA);
-                            IToken tokenB = findSymbol(";");
-                            tokenList.add(tokenB);
-                            tmpHolder = "";
-                            currentState = State.INITIALSTATE;
-                            this.scanChar(c, lineNumber, charNumber);
-                    }else{
-                        IToken token = findSymbol(tmpHolder);
+                tmpHolder += c;
+            } else if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || (' ' == c)
+                    || ('\t' == c) || ('\u0003' == c) || ('\n' == c) || ('\r' == c)) {
+
+                if (tmpHolder.length() >= 2) {
+
+                    IToken token;
+
+                    if (tmpHolder.charAt(0) == '<' || tmpHolder.charAt(0) == '>' || tmpHolder.charAt(0) == '&'
+                            || tmpHolder.charAt(0) == '|' || tmpHolder.charAt(0) == ':') {
+                        token = findSymbol(tmpHolder);
                         if (token != null) {
                             tokenList.add(token);
-                            tmpHolder = "";
-                            currentState = State.INITIALSTATE;
-                            this.scanChar(c, lineNumber, charNumber);
-                        } else {
-                            throw new LexicalError("Illegal length of a Symbol at " + charNumber + ": " + c, lineNumber);
-                        }  
-                    }             
+                        }
+                        for (char ch : tmpHolder.toCharArray()) {
+                            token = findSymbol("" + ch);
+                            if (token != null) {
+                                tokenList.add(findSymbol("" + ch));
+                            } else {
+                                throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                            }
+                        }
+                    } else {
+                        for (char ch : tmpHolder.toCharArray()) {
+                            token = findSymbol("" + ch);
+                            if (token != null) {
+                                tokenList.add(findSymbol("" + ch));
+                            } else {
+                                throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                            }
+                        }
+                    }
+
+                    tmpHolder = "";
+                    currentState = State.INITIALSTATE;
+                    this.scanChar(c, lineNumber, charNumber);
+
+                } else if (tmpHolder.length() == 1) {
+                    IToken token = findSymbol(tmpHolder);
+                    if (token != null) {
+                        tokenList.add(token);
+                    } else {
+                        throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                    }
+
+                    tmpHolder = "";
+                    currentState = State.INITIALSTATE;
+                    this.scanChar(c, lineNumber, charNumber);
+
                 } else {
-                    throw new LexicalError("Illegal length of a Symbol at " + charNumber + ": " + c, lineNumber);
+                    throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
                 }
-                tmpHolder = "";
-            } else if ('\u0003' == c) {
 
             } else {
                 throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
@@ -162,9 +179,9 @@ public class Scanner {
     }
 
     private IToken scanKeyword(String tmpHolder) {
-            
+
         switch (tmpHolder.toUpperCase()) {
-        
+
         case ("DEBUGIN"):
             return new Keywords.DebugIn();
         case ("DEBUGOUT"):
@@ -229,7 +246,7 @@ public class Scanner {
     private IToken findSymbol(String s) {
         if (s.length() == 1) {
             switch (s) {
-            
+
             case ("("):
                 return new Symbol.LParen();
             case (")"):
@@ -266,7 +283,7 @@ public class Scanner {
 
         } else if (s.length() == 2) {
             switch (s) {
-            
+
             case ("<="):
                 return new Operator.RelOpr(OperatorAttribute.LE);
             case (">="):
@@ -281,8 +298,6 @@ public class Scanner {
                 return null;
             case ("|?"):
                 return new Operator.BoolOpr(OperatorAttribute.COR);
-            case ("()"):
-                
             default:
                 return null;
             }
