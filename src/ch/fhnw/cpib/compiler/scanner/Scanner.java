@@ -59,7 +59,7 @@ public class Scanner {
                 IToken token = new Keywords.Sentinel();
                 tokenList.add(token);
             } else {
-                throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                throw new LexicalError("unknown char", c, lineNumber, charNumber);
             }
             break;
 
@@ -79,7 +79,7 @@ public class Scanner {
                 currentState = State.INITIALSTATE;
                 this.scanChar(c, lineNumber, charNumber);
             } else {
-                throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                throw new LexicalError("unknown char", c, lineNumber, charNumber);
             }
 
             break;
@@ -107,7 +107,7 @@ public class Scanner {
                 currentState = State.INITIALSTATE;
                 this.scanChar(c, lineNumber, charNumber);
             } else {
-                throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                throw new LexicalError("unknown char", c, lineNumber, charNumber);
             }
 
             break;
@@ -133,7 +133,7 @@ public class Scanner {
                             if (token != null) {
                                 tokenList.add(findSymbol("" + ch));
                             } else {
-                                throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                                throw new LexicalError("unknown char", c, lineNumber, charNumber);
                             }
                         }
                     } else {
@@ -142,7 +142,7 @@ public class Scanner {
                             if (token != null) {
                                 tokenList.add(findSymbol("" + ch));
                             } else {
-                                throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                                throw new LexicalError("unknown char", c, lineNumber, charNumber);
                             }
                         }
                     }
@@ -156,7 +156,7 @@ public class Scanner {
                     if (token != null) {
                         tokenList.add(token);
                     } else {
-                        throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                        throw new LexicalError("unknown char", c, lineNumber, charNumber);
                     }
 
                     tmpHolder = "";
@@ -164,17 +164,17 @@ public class Scanner {
                     this.scanChar(c, lineNumber, charNumber);
 
                 } else {
-                    throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                    throw new LexicalError("unknown char", c, lineNumber, charNumber);
                 }
 
             } else {
-                throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+                throw new LexicalError("unknown char", c, lineNumber, charNumber);
             }
 
             break;
 
         default:
-            throw new LexicalError("unknown char at " + charNumber + ": " + c, lineNumber);
+            throw new LexicalError("unknown char", c, lineNumber, charNumber);
         }
     }
 

@@ -20,7 +20,7 @@ public class run {
     
     public static void compile(BufferedReader source) throws IOException {
         
-        System.out.println("Start compiling the following program:");
+        System.out.println("> Code:\n");
         String currentLine = "";
         StringBuilder program = new StringBuilder();
         
@@ -29,18 +29,17 @@ public class run {
             program.append(currentLine+"\n");
         }
         
-        System.out.println("Scanning:");
+        System.out.println("\n > Scanning:\n");
         
         ITokenList tokenList = null;
         Scanner scanner = new Scanner();
         try {
             tokenList = scanner.scan(new BufferedReader(new StringReader(program.toString())));
             
+            System.out.println(tokenList.toString());
+            
         } catch(Exception e) {
-            System.out.println("ERROR! " + e.getMessage());
+            System.out.println(e.getMessage());
         }
-        
-        System.out.println(tokenList.toString());
-        
     }
 }

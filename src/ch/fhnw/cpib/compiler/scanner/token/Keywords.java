@@ -1,8 +1,6 @@
 package ch.fhnw.cpib.compiler.scanner.token;
 
-import ch.fhnw.cpib.compiler.scanner.enums.OperatorAttribute;
 import ch.fhnw.cpib.compiler.scanner.enums.Terminals;
-import ch.fhnw.cpib.compiler.scanner.enums.TypeAttribute;
 
 public abstract class Keywords extends BaseToken {
 
