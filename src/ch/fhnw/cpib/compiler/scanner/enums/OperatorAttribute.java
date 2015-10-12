@@ -1,6 +1,6 @@
 package ch.fhnw.cpib.compiler.scanner.enums;
 
-public enum Operator {
+public enum OperatorAttribute {
     
     // Addition
     PLUS("PLUS"), MINUS("MINUS"),
@@ -19,7 +19,7 @@ public enum Operator {
     
     private String toString;
     
-    Operator(String toString) {
+    OperatorAttribute(String toString) {
         this.toString = toString;
     }
         

@@ -1,10 +1,10 @@
 package ch.fhnw.cpib.compiler.scanner.enums;
 
-public enum Type {
+public enum TypeAttribute {
     
     INT64("INT64"), BOOL("BOOL");
     
-    Type(String toString) {
+    TypeAttribute(String toString) {
         this.toString = toString;
     }
     
