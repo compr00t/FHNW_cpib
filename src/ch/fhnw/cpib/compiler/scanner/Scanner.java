@@ -15,7 +15,6 @@ public class Scanner {
      * 
      * Abweichungen:
      * - Division als '/' implementiert anstelle von 'div'
-     * - Keine Implementierung für negative Zahlen
      *  
      */
     
@@ -128,6 +127,9 @@ public class Scanner {
         case SYMBOLSTATE:
             if (ScannerSymbols.contains((int) c)) {
                 tmpHolder += c;
+            } else if ('0' <= c && c <= '9') {
+                currentState = State.LITERALSTATE;
+                tmpHolder += c;                
             } else if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || (' ' == c)
                     || ('\t' == c) || ('\u0003' == c) || ('\n' == c) || ('\r' == c)) {
 

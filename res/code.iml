@@ -3,20 +3,21 @@ global
 	proc divide(const m:int64, copy n:int64, ref var q:int64, ref var r:int64)
 	do
 		q init := 0;
+		x init := -5;
 		r init := m;
 		while r >= n do
 			q := q + 1;
-			r := r / n
+			r := r / n;
 			r := r % n
 		endwhile
 	endproc;
 
-	// test
+	// test@1
 
 	var m_x:int64;
 	var n`:int64;
 	var q:int64;
-	var r:int64;
+	var r:int64; //test@2
 	var x:array
 do
 	debugin m init;
