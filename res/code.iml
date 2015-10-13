@@ -10,6 +10,8 @@ global
 		endwhile
 	endproc;
 
+// test
+
 	var m:int64;
 	var n:int64;
 	var q:int64;
