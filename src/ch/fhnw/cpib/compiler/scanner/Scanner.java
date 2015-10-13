@@ -206,6 +206,8 @@ public class Scanner {
             return new BaseType.Type(TypeAttribute.INT64);
         case ("BOOL"):
             return new BaseType.Type(TypeAttribute.BOOL);
+        case ("ARRAY"):
+            return new BaseType.Type(TypeAttribute.ARRAY);
         case ("CALL"):
             return new Keywords.Call();
         case ("NOT"):

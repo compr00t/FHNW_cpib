@@ -2,7 +2,7 @@ package ch.fhnw.cpib.compiler.scanner.enums;
 
 public enum TypeAttribute {
     
-    INT64("INT64"), BOOL("BOOL");
+    INT64("INT64"), BOOL("BOOL"), ARRAY("ARRAY");
     
     TypeAttribute(String toString) {
         this.toString = toString;

@@ -24,7 +24,7 @@ public abstract class BaseType extends BaseToken {
 
         public Type(TypeAttribute value) {
             super(Terminals.TYPE, value);
-            assert (TypeAttribute.INT64 == value || TypeAttribute.BOOL == value);
+            assert (TypeAttribute.INT64 == value || TypeAttribute.BOOL == value || TypeAttribute.ARRAY == value);
         }
     }    
 }

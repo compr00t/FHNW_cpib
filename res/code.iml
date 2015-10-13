@@ -16,7 +16,8 @@ global
 	var m_x:int64;
 	var n`:int64;
 	var q:int64;
-	var r:int64
+	var r:int64;
+	var x:array
 do
 	debugin m init;
 	debugin n init;
