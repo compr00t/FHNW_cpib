@@ -17,7 +17,6 @@ public class Scanner {
      * - Division als '/' implementiert anstelle von 'div'
      * - Keine Implementierung für negative Zahlen
      * - Keine Modes (Mechmode, Changemode)
-     * - Keine Unterstützung für '_' und '`' in Idents
      * - Keine Modulo-Operation
      *  
      */
@@ -109,7 +108,7 @@ public class Scanner {
             break;
 
         case IDENTIFIERSTATE:
-            if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9')) {
+            if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || (c == '_') || (c == '`')) {
                 tmpHolder += c;
             } else if ((' ' == c) || ('\t' == c) || ('\n' == c) || ('\r' == c)) {
                 IToken token = scanKeyword(tmpHolder);
