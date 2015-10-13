@@ -9,6 +9,19 @@ import ch.fhnw.cpib.compiler.scanner.token.*;
 
 public class Scanner {
 
+    /*
+     * Implementation vom Scanner:
+     * Stati als ENUM erstellt und in Switch-Case-Funktion implementiert.
+     * 
+     * Abweichungen:
+     * - Division als '/' implementiert anstelle von 'div'
+     * - Keine Implementierung für negative Zahlen
+     * - Keine Modes (Mechmode, Changemode)
+     * - Keine Unterstützung für '_' und '`' in Idents
+     * - Keine Modulo-Operation
+     *  
+     */
+    
     private enum State {
         INITIALSTATE, LITERALSTATE, IDENTIFIERSTATE, SYMBOLSTATE
     };
@@ -38,7 +51,6 @@ public class Scanner {
                     scanChar(currentLine.charAt(i), lineNumber, charNumber);
                 }
             }
-
         }
 
         charNumber = 0;
