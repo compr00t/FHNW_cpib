@@ -1,11 +1,11 @@
 package ch.fhnw.cpib.compiler.scanner.enums;
 
-public enum Mode {
+public enum ModeAttributes {
     
-    COPY("COPY"), REF("REF"), IN("IN"), OUT("OUT"),
-    INOUT("INOUT"), CONST("CONST"), VAR("VAR");
+    COPY("COPY"), REF("REF"),
+    CONST("CONST"), VAR("VAR");
     
-    Mode(String toString){
+    ModeAttributes(String toString){
         this.toString = toString;
     }
     
@@ -15,5 +15,4 @@ public enum Mode {
     public String toString(){
         return toString;
     }
-
 }

@@ -91,13 +91,6 @@ public abstract class Keywords extends BaseToken {
         }
     }
     
-    public static class Flowmode extends Keywords {
-
-        public Flowmode() {
-            super(Terminals.FLOWMODE);
-        }
-    }
-    
     public static class Changemode extends Keywords {
 
         public Changemode() {

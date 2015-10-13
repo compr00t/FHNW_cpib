@@ -1,6 +1,6 @@
 program intDiv()
 global
-	proc divide(in copy m:int64, in copy n:int64, out ref var q:int64, out ref var r:int64)
+	proc divide(const m:int64, copy n:int64, ref var q:int64, ref var r:int64)
 	do
 		q init := 0;
 		r init := m;

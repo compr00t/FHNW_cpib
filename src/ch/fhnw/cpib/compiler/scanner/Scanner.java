@@ -16,7 +16,6 @@ public class Scanner {
      * Abweichungen:
      * - Division als '/' implementiert anstelle von 'div'
      * - Keine Implementierung für negative Zahlen
-     * - Keine Modes (Mechmode, Changemode)
      *  
      */
     
@@ -217,12 +216,14 @@ public class Scanner {
             return new Keywords.Else();
         case ("ENDIF"):
             return new Keywords.EndIf();
-        case ("FLOWMODE"):
-            return null;
-        case ("CHANGEMODE"):
-            return null;
-        case ("MECHMODE"):
-            return null;
+        case ("CONST"):
+            return new Mode.ChangeMode(ModeAttributes.CONST);
+        case ("VAR"):
+            return new Mode.ChangeMode(ModeAttributes.VAR);
+        case ("REF"):
+            return new Mode.MechMode(ModeAttributes.REF);
+        case ("COPY"):
+            return new Mode.MechMode(ModeAttributes.COPY);
         case ("FUN"):
             return new Keywords.Fun();
         case ("GLOBAL"):
