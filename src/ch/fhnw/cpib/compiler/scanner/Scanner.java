@@ -15,6 +15,7 @@ public class Scanner {
      * 
      * Abweichungen:
      * - Division als '/' implementiert anstelle von 'div'
+     * - Modulo als '%' implementiert anstelle von 'mod'
      *  
      */
     
