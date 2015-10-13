@@ -1,6 +1,6 @@
 program intDiv()
 global
-	proc divide(in copy m:int32, in copy n:int32, out ref var q:int32, out ref var r:int32)
+	proc divide(in copy m:int64, in copy n:int64, out ref var q:int64, out ref var r:int64)
 	do
 		q init := 0;
 		r init := m;
@@ -10,10 +10,10 @@ global
 		endwhile
 	endproc;
 
-	var m:int32;
-	var n:int32;
-	var q:int32;
-	var r:int32
+	var m:int64;
+	var n:int64;
+	var q:int64;
+	var r:int64
 do
 	debugin m init;
 	debugin n init;

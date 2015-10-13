@@ -97,20 +97,12 @@ public class Scanner {
 				tmpHolder += c;
 			} else if ((' ' == c) || ('\t' == c) || ('\n' == c) || ('\r' == c)) {
 				IToken token = scanKeyword(tmpHolder);
-				if (token == null) {
-					tokenList.add(new Ident(tmpHolder));
-				} else {
-					tokenList.add(token);
-				}
+				tokenList.add(token);
 				tmpHolder = "";
 				currentState = State.INITIALSTATE;
 			} else if (ScannerSymbols.contains((int) c) || '\u0003' == c) {
 				IToken token = scanKeyword(tmpHolder);
-				if (token == null) {
-					tokenList.add(new Ident(tmpHolder));
-				} else {
-					tokenList.add(token);
-				}
+				tokenList.add(token);
 				tmpHolder = "";
 				currentState = State.INITIALSTATE;
 				this.scanChar(c, lineNumber, charNumber);
@@ -248,7 +240,7 @@ public class Scanner {
 		case ("SENTINEL"):
 			return new Keywords.Sentinel();
 		default:
-			return null;
+			return new Ident(tmpHolder);
 		}
 	}
 
