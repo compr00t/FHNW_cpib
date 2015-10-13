@@ -17,7 +17,6 @@ public class Scanner {
      * - Division als '/' implementiert anstelle von 'div'
      * - Keine Implementierung für negative Zahlen
      * - Keine Modes (Mechmode, Changemode)
-     * - Keine Modulo-Operation
      *  
      */
     
@@ -287,6 +286,8 @@ public class Scanner {
                 return new Operator.AddOpr(OperatorAttribute.MINUS);
             case ("/"):
                 return new Operator.MultOpr(OperatorAttribute.DIV);
+            case ("%"):
+                return new Operator.MultOpr(OperatorAttribute.MOD);
             case ("<"):
                 return new Operator.RelOpr(OperatorAttribute.LT);
             case (">"):

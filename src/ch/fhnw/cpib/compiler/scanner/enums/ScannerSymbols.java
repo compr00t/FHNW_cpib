@@ -4,7 +4,7 @@ public enum ScannerSymbols {
 
     LPAREN('('), RPAREN(')'), LBRACE('{'), RBRACE('}'), 
     COMMA(','), COLON(':'), SEMICOLON(';'), EQUALS('='), 
-    ASTERISK('*'), PLUS('+'), MINUS('-'),
+    ASTERISK('*'), PLUS('+'), MINUS('-'), MOD('%'),
     SLASH('/'), LT('<'), GT('>'), DOT('.');
     
     private int charValue;
