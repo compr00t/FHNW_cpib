@@ -19,6 +19,6 @@ public class LexicalError extends Exception {
     }
     
     public String getMessage() {
-        return "["+ lineNumber + ":" + charNumber + " - LexicalError] " + message + " '" + c + "'";
+        return "["+ lineNumber + ":" + charNumber + " - LexicalError] " + message + " " + c;
     }
 }

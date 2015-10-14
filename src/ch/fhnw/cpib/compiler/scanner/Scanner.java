@@ -14,8 +14,7 @@ public class Scanner {
      * Stati als ENUM erstellt und in Switch-Case-Funktion implementiert.
      * 
      * Abweichungen:
-     * - Division als '/' implementiert anstelle von 'div'
-     * - Modulo als '%' implementiert anstelle von 'mod'
+     * - keine
      *  
      */
     
@@ -259,6 +258,10 @@ public class Scanner {
             return new Keywords.EndProc();
         case ("SENTINEL"):
             return new Keywords.Sentinel();
+        case ("MOD"):
+        	return new Operator.MultOpr(OperatorAttribute.MOD);
+        case ("DIV"):
+        	return new Operator.MultOpr(OperatorAttribute.DIV);
         default:
             return new Ident(tmpHolder);
         }
@@ -290,10 +293,6 @@ public class Scanner {
                 return new Operator.AddOpr(OperatorAttribute.PLUS);
             case ("-"):
                 return new Operator.AddOpr(OperatorAttribute.MINUS);
-            case ("/"):
-                return new Operator.MultOpr(OperatorAttribute.DIV);
-            case ("%"):
-                return new Operator.MultOpr(OperatorAttribute.MOD);
             case ("<"):
                 return new Operator.RelOpr(OperatorAttribute.LT);
             case (">"):

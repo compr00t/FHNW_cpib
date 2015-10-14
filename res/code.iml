@@ -7,8 +7,8 @@ global
 		r init := m;
 		while r >= n do
 			q := q + 1;
-			r := r / n;
-			r := r % n
+			r := r div n;
+			r := r mod n
 		endwhile
 	endproc;
 
