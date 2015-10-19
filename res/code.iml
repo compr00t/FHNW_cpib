@@ -4,6 +4,7 @@ global
 	do
 		q init := 0;
 		x init := -5;
+		n init := +3;
 		r init := m;
 		while r >= n do
 			q := q + 1;

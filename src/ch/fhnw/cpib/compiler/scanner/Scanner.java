@@ -25,6 +25,7 @@ public class Scanner {
     State currentState;
     private ITokenList tokenList;
     String tmpHolder = "";
+    char oldHolder;
 
     public ITokenList scan(BufferedReader inBuffer) throws LexicalError, IOException {
 
@@ -73,6 +74,7 @@ public class Scanner {
             } else if (ScannerSymbols.contains((int) c)) {
                 currentState = State.SYMBOLSTATE;
                 tmpHolder = "" + c;
+                oldHolder = c;
             } else if ((' ' == c) || ('\t' == c) || ('\n' == c) || ('\r' == c)) {
                 currentState = State.INITIALSTATE;
             } else if ('\u0003' == c) {
@@ -127,7 +129,7 @@ public class Scanner {
         case SYMBOLSTATE:
             if (ScannerSymbols.contains((int) c)) {
                 tmpHolder += c;
-            } else if ('0' <= c && c <= '9') {
+            } else if ('0' <= c && c <= '9' && (oldHolder == '-' || oldHolder == '+')) {
                 currentState = State.LITERALSTATE;
                 tmpHolder += c;                
             } else if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || (' ' == c)
