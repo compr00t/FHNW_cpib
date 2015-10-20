@@ -129,7 +129,8 @@ public class Scanner {
         case SYMBOLSTATE:
             if (ScannerSymbols.contains((int) c)) {
                 tmpHolder += c;
-            } else if ('0' <= c && c <= '9' && (oldHolder == '-' || oldHolder == '+')) {
+                oldHolder = c;
+            } else if ('0' <= c && c <= '9' && (oldHolder == '-' || oldHolder == '+') && tmpHolder.length() == 1) {
                 currentState = State.LITERALSTATE;
                 tmpHolder += c;                
             } else if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || (' ' == c)
