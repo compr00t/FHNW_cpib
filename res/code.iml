@@ -1,7 +1,9 @@
 program intDiv
 global
-	const m:int32; const n:int32;
-	const q:int32; const r:int32;
+	const m:int64; const n:int64;
+	const q:int64; const r:int64;
+	const x:array;
+	
 	proc divide(copy const m:int32, copy const n:int32,
 		ref var q:int32, ref var r:int32)
 	
