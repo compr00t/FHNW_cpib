@@ -1,4 +1,4 @@
-package ch.fhwn.cpib.compiler.parser;
+package ch.fhnw.cpib.compiler.parser;
 
 import ch.fhnw.cpib.compiler.exception.GrammarError;
 import ch.fhnw.cpib.compiler.scanner.IToken;
