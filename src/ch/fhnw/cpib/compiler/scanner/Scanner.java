@@ -3,7 +3,7 @@ package ch.fhnw.cpib.compiler.scanner;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import ch.fhnw.cpib.compiler.scanner.exception.LexicalError;
+import ch.fhnw.cpib.compiler.exception.LexicalError;
 import ch.fhnw.cpib.compiler.scanner.enums.*;
 import ch.fhnw.cpib.compiler.scanner.token.*;
 

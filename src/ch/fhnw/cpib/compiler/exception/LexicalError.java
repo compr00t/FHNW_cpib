@@ -1,4 +1,4 @@
-package ch.fhnw.cpib.compiler.scanner.exception;
+package ch.fhnw.cpib.compiler.exception;
 
 public class LexicalError extends Exception {
 
@@ -6,7 +6,9 @@ public class LexicalError extends Exception {
 
     private final int lineNumber;
     private final int charNumber;
+    
     private final char c;
+    
     private final String message;
     
     public LexicalError(String message, char c, int lineNumber, int charNumber) {
