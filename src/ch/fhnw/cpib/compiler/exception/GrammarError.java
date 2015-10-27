@@ -23,5 +23,4 @@ public class GrammarError extends Exception{
 	public String getMessage() {
         return "["+ lineNumber + ":" + charNumber + " - GrammaticalError] " + message + " " + c;
     }
-
 }

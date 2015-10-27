@@ -41,5 +41,8 @@ public class run {
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
+        
+        System.out.println("\n > Parsing:\n");
+        
     }
 }
