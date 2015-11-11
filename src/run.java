@@ -35,11 +35,11 @@ public class run {
         Scanner scanner = new Scanner();
         try {
             tokenList = scanner.scan(new BufferedReader(new StringReader(program.toString())));
-            
             System.out.println(tokenList.toString());
             
         } catch(Exception e) {
             System.out.println(e.getMessage());
+            System.exit(1);
         }
         
         System.out.println("\n > Parsing:\n");
