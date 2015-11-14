@@ -1,13 +1,10 @@
 program intDiv
 global
-	const m:int64; const n:int64;
-	const q:int64; const r:int64;
-	const x:array;
-	
-	proc divide(copy const m:int32, copy const n:int32,
-		ref var q:int32, ref var r:int32)
-	
+	proc divide(copy const m:int32, copy const n:int32, ref var q:int32, ref var r:int32)
 	do
+	
+		var m:int64;
+	
 		q init := -5;
 		r init := m;
 		while r >= n do
@@ -15,7 +12,7 @@ global
 			r := r - n
 		endwhile
 	endproc
-
+	
 	// test@@
 	
 do
