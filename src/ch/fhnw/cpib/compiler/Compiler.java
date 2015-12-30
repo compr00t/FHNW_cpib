@@ -55,7 +55,7 @@ public final class Compiler {
 
     public static void compile(BufferedReader source) throws IOException, GrammarError {
 
-        System.out.println("> Code:\n");
+        System.out.println("> Code: \n");
         String currentLine = "";
         StringBuilder program = new StringBuilder();
 
@@ -81,16 +81,12 @@ public final class Compiler {
 
         final Parser parser = new Parser(tokenList);
         final ConcTree.Program concTree = parser.parse();
+        System.out.println(concTree.toString());
         
-        System.out.println("\n > Concrete syntax tree: \n");
-        System.out.println(concTree.toString(""));
+        System.out.println(" > Converter:\n");
         
-        System.out.println("Generating abstract syntax tree:");
         final AbsTree.Program absTree = concTree.toAbstract();
-        
-        System.out.println("Success!");
-        System.out.println("\nAbstract syntax tree:");
-        System.out.println(absTree.toString(""));
+        System.out.println(absTree.toString());
     }
 
     public static void main(String[] args) {
