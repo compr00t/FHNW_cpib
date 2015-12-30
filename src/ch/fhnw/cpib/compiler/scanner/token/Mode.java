@@ -7,17 +7,26 @@ public class Mode extends BaseToken{
 
     private final ModeAttributes value;
 
-    Mode(Terminals term, ModeAttributes value) {
+    public Mode(Terminals term, ModeAttributes value) {
         super(term);
         this.value = value;
     }
 
-    ModeAttributes getValue() {
+    public ModeAttributes getValue() {
         return value;
     }
 
     public String toString() {
         return "(" + super.toString() + "," + value.toString() + ")";
+    }
+    
+    public String toString(final String indent) {
+        return indent
+                + "<Mode name=\""
+                + getTerminal().toString()
+                + "\" attribute=\""
+                + value.toString()
+                + "\"/>\n";
     }
 
     public static class ChangeMode extends Mode {

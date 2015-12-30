@@ -11,11 +11,18 @@ private final String value;
         value = i;
     }
 
-    String getValue() {
+    public String getValue() {
         return value;
     }
     
     public String toString() {
         return "(" + super.toString() + ", \"" + value + "\")";
+    }
+
+    public String toString(final String indent) {
+        return indent
+                + "<Ident name=\""
+                + value
+                + "\"/>\n";
     }
 }

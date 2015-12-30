@@ -12,12 +12,21 @@ public class Operator extends BaseToken {
         this.value = value;
     }
 
-    OperatorAttribute getValue() {
+    public OperatorAttribute getValue() {
         return value;
     }
 
     public String toString() {
         return "(" + super.toString() + "," + value.toString() + ")";
+    }
+    
+    public String toString(final String indent) {
+        return indent
+                + "<Operator name=\""
+                + getTerminal().toString()
+                + "\" attribute=\""
+                + value.toString()
+                + "\"/>\n";
     }
 
     public static class BoolOpr extends Operator {
