@@ -4,14 +4,15 @@ import ch.fhnw.cpib.compiler.scanner.IToken;
 import ch.fhnw.cpib.compiler.scanner.enums.*;
 
 public abstract class BaseToken implements IToken {
+    
     private final Terminals terminal;
 
-    BaseToken(Terminals t) {
-        terminal = t;
+    BaseToken(Terminals terminal) {
+        this.terminal = terminal;
     }
 
     public Terminals getTerminal() {
-        return terminal;
+        return this.terminal;
     }
 
     public String toString() {

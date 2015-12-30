@@ -208,11 +208,11 @@ public class Scanner {
         case ("PROGRAM"):
             return new Keywords.Program();
         case ("INT64"):
-            return new BaseType.Type(TypeAttribute.INT64);
+            return new Type(TypeAttribute.INT64);
         case ("BOOL"):
-            return new BaseType.Type(TypeAttribute.BOOL);
+            return new Type(TypeAttribute.BOOL);
         case ("ARRAY"):
-            return new BaseType.Type(TypeAttribute.ARRAY);
+            return new Type(TypeAttribute.ARRAY);
         case ("CALL"):
             return new Keywords.Call();
         case ("NOT"):

@@ -85,11 +85,12 @@ public final class Compiler {
         System.out.println("\n > Concrete syntax tree: \n");
         System.out.println(concTree.toString(""));
         
-        // System.out.println("Generating abstract syntax tree:");
-        // final AbsTree.Program absTree = concTree.toAbstract();
-        // System.out.println("Success!");
-        // System.out.println("\nAbstract syntax tree:");
-        // System.out.println(absTree.toString(""));
+        System.out.println("Generating abstract syntax tree:");
+        final AbsTree.Program absTree = concTree.toAbstract();
+        
+        System.out.println("Success!");
+        System.out.println("\nAbstract syntax tree:");
+        System.out.println(absTree.toString(""));
     }
 
     public static void main(String[] args) {

@@ -5,22 +5,22 @@ import ch.fhnw.cpib.compiler.scanner.enums.TypeAttribute;
 
 public class Type extends BaseToken {
 
-    private final TypeAttribute attribute;
+    private final TypeAttribute value;
 
     public Type(TypeAttribute attribute) {
         super(Terminals.TYPE);
-        this.attribute = attribute;
+        this.value = attribute;
     }
 
-    public TypeAttribute getAttribute() {
-        return attribute;
+    public TypeAttribute getValue() {
+        return value;
     }
 
     public String toString() {
-        return "(TYPE, " + attribute.toString() + ")";
+        return "(TYPE, " + value.toString() + ")";
     }
 
     public String toString(final String indent) {
-        return indent + "<Type type=\"" + attribute.toString() + "\"/>\n";
+        return indent + "<Type type=\"" + value.toString() + "\"/>\n";
     }
 }

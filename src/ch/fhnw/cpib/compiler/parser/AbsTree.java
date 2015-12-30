@@ -868,7 +868,7 @@ public interface AbsTree {
                 typeR = (Type) tmp;
             }
 
-            if (typeR.getAttribute() != typeL.getAttribute()) {
+            if (typeR.getValue() != typeL.getValue()) {
                 throw new ContextError("Types in assignemt don't match!");
             }
 
@@ -955,7 +955,7 @@ public interface AbsTree {
                 type = (Type) tmp;
             }
 
-            if (type.getAttribute() != TypeAttribute.BOOL) {
+            if (type.getValue() != TypeAttribute.BOOL) {
                 throw new ContextError("IF condition must be a boolean! ");
             }
 
@@ -1046,7 +1046,7 @@ public interface AbsTree {
             } else {
                 type = (Type) tmp;
             }
-            if (type.getAttribute() != TypeAttribute.BOOL) {
+            if (type.getValue() != TypeAttribute.BOOL) {
                 throw new ContextError("WHILE condition must be a boolean! ");
             }
             cmd.check(true);
@@ -1682,28 +1682,28 @@ public interface AbsTree {
                 case TIMES:
                 case DIV:
                 case MOD:
-                    if (type1.getAttribute() == TypeAttribute.INT64 && type2.getAttribute() == TypeAttribute.INT64) {
+                    if (type1.getValue() == TypeAttribute.INT64 && type2.getValue() == TypeAttribute.INT64) {
                         return new Type(TypeAttribute.INT64);
                     } else {
                         throw new ContextError("Type error in Operator " + operator.getValue());
                     }
                 case EQ:
                 case NE:
-                    if (type1.getAttribute() == TypeAttribute.BOOL && type2.getAttribute() == TypeAttribute.BOOL) {
+                    if (type1.getValue() == TypeAttribute.BOOL && type2.getValue() == TypeAttribute.BOOL) {
                         return new Type(TypeAttribute.BOOL);
                     }
                 case GT:
                 case LT:
                 case GE:
                 case LE:
-                    if (type1.getAttribute() == TypeAttribute.INT64 && type2.getAttribute() == TypeAttribute.INT64) {
+                    if (type1.getValue() == TypeAttribute.INT64 && type2.getValue() == TypeAttribute.INT64) {
                         return new Type(TypeAttribute.BOOL);
                     } else {
                         throw new ContextError("Type error in Operator " + operator.getValue());
                     }
                 case CAND:
                 case COR:
-                    if (type1.getAttribute() == TypeAttribute.BOOL && type2.getAttribute() == TypeAttribute.BOOL) {
+                    if (type1.getValue() == TypeAttribute.BOOL && type2.getValue() == TypeAttribute.BOOL) {
                         return new Type(TypeAttribute.BOOL);
                     } else {
                         throw new ContextError("Type error in Operator " + operator.getValue());
@@ -1891,7 +1891,7 @@ public interface AbsTree {
                 aliasList.add(((ExprStore) expression).getStore().getIdent());
             }
 
-            if (type.getAttribute() != ((TypedIdentType) param.getType()).getType().getAttribute()) {
+            if (type.getValue() != ((TypedIdentType) param.getType()).getType().getValue()) {
                 throw new ContextError("Wrong paramter type!");
             }
 
