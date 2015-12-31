@@ -13,7 +13,8 @@ global
 	var m:int64;
 	var n:int64;
 	var q:int64;
-	var r:int64
+	var r:int64;
+	var [ -2:8 ]x:int64;
 do
 	debugin m init;
 	debugin n init;

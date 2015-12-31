@@ -2,7 +2,8 @@ package ch.fhnw.cpib.compiler.scanner.enums;
 
 public enum ScannerSymbols {
 
-    LPAREN('('), RPAREN(')'), LBRACE('{'), RBRACE('}'), 
+    LPAREN('('), RPAREN(')'), LBRACE('{'), RBRACE('}'),
+    RSBRACKET(']'), LSBRACKET('['),
     COMMA(','), COLON(':'), SEMICOLON(';'), EQUALS('='), 
     ASTERISK('*'), PLUS('+'), MINUS('-'),
     SLASH('/'), LT('<'), GT('>'), DOT('.');

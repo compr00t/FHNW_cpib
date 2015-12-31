@@ -35,6 +35,20 @@ public class Symbol extends BaseToken {
         } 
     }
     
+    public static class LSBracket extends Symbol {
+
+        public LSBracket() {
+            super(Terminals.LSBRACKET);
+        } 
+    }
+    
+    public static class RSBracket extends Symbol {
+
+        public RSBracket() {
+            super(Terminals.RSBRACKET);
+        } 
+    }
+    
     public static class Comma extends Symbol {
 
         public Comma() {

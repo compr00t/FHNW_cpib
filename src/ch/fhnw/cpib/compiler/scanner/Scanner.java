@@ -200,7 +200,7 @@ public class Scanner {
     private IToken scanKeyword(String tmpHolder) {
 
         switch (tmpHolder.toUpperCase()) {
-
+        
         case ("DEBUGIN"):
             return new Keywords.DebugIn();
         case ("DEBUGOUT"):
@@ -211,8 +211,6 @@ public class Scanner {
             return new Type(TypeAttribute.INT64);
         case ("BOOL"):
             return new Type(TypeAttribute.BOOL);
-        case ("ARRAY"):
-            return new Type(TypeAttribute.ARRAY);
         case ("CALL"):
             return new Keywords.Call();
         case ("NOT"):
@@ -273,11 +271,14 @@ public class Scanner {
     private IToken findSymbol(String s) {
         if (s.length() == 1) {
             switch (s) {
-
             case ("("):
                 return new Symbol.LParen();
             case (")"):
                 return new Symbol.RParen();
+            case ("]"):
+                return new Symbol.RSBracket();
+            case ("["):
+                return new Symbol.LSBracket();
             case ("{"):
                 return null;
             case ("}"):

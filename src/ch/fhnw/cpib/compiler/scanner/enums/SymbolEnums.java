@@ -10,7 +10,9 @@ public enum SymbolEnums {
     
     DOT("."),
     
-    LPAREN("("), RPAREN(")"), COMMA(","), SEMICOLON(";"), COLON(":"), BECOMES(":=");
+    LPAREN("("), RPAREN(")"), COMMA(","), SEMICOLON(";"), COLON(":"), BECOMES(":="),
+    
+    LSBRACKET("["), RSBRACKET("]");
     
     
     private String pattern;
