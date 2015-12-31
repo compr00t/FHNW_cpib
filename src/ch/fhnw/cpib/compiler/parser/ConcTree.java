@@ -170,25 +170,59 @@ public interface ConcTree {
     public class StorageDeclaration extends Declaration {
         private final OptionalChangeMode optionalChangeMode;
         private final TypedIdent typedIdent;
+        private final TypedArr typedArr;
 
-        public StorageDeclaration(OptionalChangeMode optionalChangeMode, TypedIdent typedIdent) {
+        public StorageDeclaration(OptionalChangeMode optionalChangeMode, TypedIdent typedIdent, TypedArr typedArr) {
             this.optionalChangeMode = optionalChangeMode;
             this.typedIdent = typedIdent;
+            this.typedArr = typedArr;
         }
 
-        public String toString(String indent) {
-            return indent
-                    + "<StorageDeclaration>\n"
-                    + optionalChangeMode.toString(indent + '\t')
-                    + typedIdent.toString(indent + '\t')
-                    + indent
-                    + "</StorageDeclaration>\n";
+        public String toString(String indent) {     
+            if (typedArr == null) {
+                return indent
+                        + "<StorageDeclaration>\n"
+                        + optionalChangeMode.toString(indent + '\t')
+                         + typedIdent.toString(indent + '\t')
+                        + indent
+                        + "</StorageDeclaration>\n";
+            } else {
+                return indent
+                        + "<StorageDeclaration>\n"
+                        + optionalChangeMode.toString(indent + '\t')
+                         + typedArr.toString(indent + '\t')
+                        + indent
+                        + "</StorageDeclaration>\n";
+            }
         }
         
         public AbsTree.DeclarationStore toAbstract(RepeatingOptionalDeclarations repeatingOptionalDeclarations) {
             return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedIdent.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
         }
     }
+    
+//    public class ArrayDeclaration extends Declaration {
+//        private final OptionalChangeMode optionalChangeMode;
+//        private final TypedArr typedArr;
+//
+//        public ArrayDeclaration(OptionalChangeMode optionalChangeMode, TypedArr typedArr) {
+//            this.optionalChangeMode = optionalChangeMode;
+//            this.typedArr = typedArr;
+//        }
+//
+//        public String toString(String indent) {
+//            return indent
+//                    + "<StorageDeclaration>\n"
+//                    + optionalChangeMode.toString(indent + '\t')
+//                    + typedArr.toString(indent + '\t')
+//                    + indent
+//                    + "</StorageDeclaration>\n";
+//        }
+//        
+//        //public AbsTree.DeclarationStore toAbstract(RepeatingOptionalDeclarations repeatingOptionalDeclarations) {
+//        //    return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedArr.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
+//        //}
+//    }
     
     public class FunctionDeclaration extends Declaration {
         private final Ident ident;
@@ -276,6 +310,54 @@ public interface ConcTree {
             return optionalProgramParameters.toAbstract();
         }
     }
+    
+    public class TypedArr {
+        private final RangeVal rangeVal;
+        private final TypedIdent typedIdent;
+        
+        public TypedArr(RangeVal rangeVal, TypedIdent typedIdent){
+            this.rangeVal = rangeVal;
+            this.typedIdent = typedIdent;
+        }
+
+        public String toString(String indent) {
+            return indent
+                    + "<TypedArr>\n"
+                    + rangeVal.toString(indent + '\t')
+                    + typedIdent.toString(indent + '\t')
+                    + indent
+                    + "</TypedArr>\n";
+        }
+        
+        //public AbsTree.TypedArr toAbstract() {
+        //    return typeDeclaration.toAbstract(ident);
+        //}
+    }
+    
+    public class RangeVal {
+        private final Expression expression;
+        private final Expression nextExpression;
+        
+        public RangeVal(Expression expression, Expression nextExpression) {
+            this.expression = expression;
+            this.nextExpression = nextExpression;
+        }
+
+        public String toString(String indent) {
+            return indent
+                    + "<RangeVal>\n"
+                    + expression.toString(indent + '\t')
+                    + nextExpression.toString(indent + '\t')
+                    + indent
+                    + "</RangeVal>\n";
+        }
+        
+        //public AbsTree.RangeValAssi toAbstract() {
+        //    return new AbsTree.CmdAssi(expression.toAbstract(), nextExpression.toAbstract());
+        //}
+    }
+    
+    
 
     public class TypedIdent {
         private final Ident ident;
@@ -305,6 +387,7 @@ public interface ConcTree {
         public abstract AbsTree.TypedIdent toAbstract(Ident ident);
         
     }
+    
     public class TypeDeclarationType extends TypeDeclaration {
         
         private final Type type;
@@ -324,7 +407,6 @@ public interface ConcTree {
         public AbsTree.TypedIdentType toAbstract(Ident ident) {
             return new AbsTree.TypedIdentType(ident, type);
         }
-        
     }
     public class TypeDeclarationIdent extends TypeDeclaration {
         private final Ident ident;
@@ -1325,6 +1407,30 @@ public interface ConcTree {
         
         public AbsTree.ExprLiteral toAbstract() {
             return new AbsTree.ExprLiteral(literal);
+        }
+    }
+    
+    public class FactorArray extends Factor {
+        private final Expression expression;
+        private final Ident ident;
+        
+        public FactorArray(Expression expression, Ident ident) {
+            this.expression = expression;
+            this.ident = ident;
+        }
+
+        public String toString(String indent) {
+            return indent
+                    + "<FactorArray>\n"
+                    + expression.toString(indent + '\t')
+                    + ident.toString(indent + '\t')
+                    + indent
+                    + "</FactorArray>\n";
+        }
+        
+        public AbsTree.Expression toAbstract() {
+            //return optionalIdent.toAbstract(ident);
+            return null;
         }
     }
     

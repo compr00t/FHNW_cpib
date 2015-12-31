@@ -97,6 +97,9 @@ public class Parser {
             //System.out.println("declaration ::= procedureDeclaration");
             return procedureDeclaration();
         case CHANGEMODE:
+        case LSBRACKET:
+            //System.out.println("declaration ::= storageDeclaration");
+            return storageDeclaration();
         case IDENT:
             //System.out.println("declaration ::= storageDeclaration");
             return storageDeclaration();
@@ -121,8 +124,13 @@ public class Parser {
     private ConcTree.StorageDeclaration storageDeclaration() throws GrammarError {
         //System.out.println("storageDeclaration ::= optionalChangeMode typedIdent");
         ConcTree.OptionalChangeMode optionalChangeMode = optionalChangeMode();
-        ConcTree.TypedIdent typedIdent = typedIdent();
-        return new ConcTree.StorageDeclaration(optionalChangeMode, typedIdent);
+        if (terminal == Terminals.LSBRACKET) {
+            ConcTree.TypedArr typedArr = typedArr();
+            return new ConcTree.StorageDeclaration(optionalChangeMode, null, typedArr);
+        } else {
+            ConcTree.TypedIdent typedIdent = typedIdent();
+            return new ConcTree.StorageDeclaration(optionalChangeMode, typedIdent, null);
+        }
     }
 
     private ConcTree.FunctionDeclaration functionDeclaration() throws GrammarError {
@@ -229,6 +237,23 @@ public class Parser {
         TypeDeclaration typeDeclaration = typeDeclaration();
         return new ConcTree.TypedIdent(ident, typeDeclaration);
     }
+    
+    private ConcTree.TypedArr typedArr() throws GrammarError {
+        //System.out.println("typedArr ::= LSBRACKET rangeVal RSBRACKET typedIdent");
+        consume(Terminals.LSBRACKET);
+        RangeVal rangeVal = rangeVal();
+        consume(Terminals.RSBRACKET);
+        TypedIdent typedIdent = typedIdent();
+        return new ConcTree.TypedArr(rangeVal, typedIdent);
+    }
+    
+    private ConcTree.RangeVal rangeVal() throws GrammarError {
+      //System.out.println("rangeVal ::= expr COLON expr");
+        Expression expression = expression();
+        consume(Terminals.COLON);
+        Expression nextExpression = expression();
+        return new ConcTree.RangeVal(expression, nextExpression);
+    }
 
     private ConcTree.TypeDeclaration typeDeclaration() throws GrammarError {
         if (terminal == Terminals.IDENT) {
@@ -322,6 +347,13 @@ public class Parser {
             consume(Terminals.BECOMES);
             ConcTree.Expression nextExpression = expression();
             ret = new ConcTree.CmdExpression(expression, nextExpression);
+            break;
+        case LSBRACKET:
+            //System.out.println("cmd ::= expression BECOMES expression);
+            ConcTree.Expression expression2 = expression();
+            consume(Terminals.BECOMES);
+            ConcTree.Expression nextExpression2 = expression();
+            ret = new ConcTree.CmdExpression(expression2, nextExpression2);
             break;
         default:
             throw new GrammarError("terminal expected: SKIP | IF | CALL | WHILE | DEBUGIN | DEBUGOUT | IDENT, terminal found: " + terminal + " in a command");
@@ -501,6 +533,14 @@ public class Parser {
             ConcTree.Expression expression = expression();
             consume(Terminals.RPAREN);
             ret = new ConcTree.FactorExpression(expression);
+            break;
+        case LSBRACKET:
+            //System.out.println("factor ::= LSBRACKET expression RSBRACKET IDENT");
+            consume(Terminals.LSBRACKET);
+            ConcTree.Expression expression2 = expression();
+            consume(Terminals.RSBRACKET);
+            Ident ident2 = (Ident) consume(Terminals.IDENT);
+            ret = new ConcTree.FactorArray(expression2, ident2);
             break;
         default:
             //System.out.println("factor ::= monadicOperator factor");

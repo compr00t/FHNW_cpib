@@ -2,7 +2,7 @@ program intDiv()
 global
 	proc divide(copy m:int64, copy n:int64, ref var q:int64, ref var r:int64)
 	do
-		q init := 0;
+		q init := 0 + 1;
 		r init := m;
 		while r >= n do
 			q := q + 1;
@@ -14,11 +14,13 @@ global
 	var n:int64;
 	var q:int64;
 	var r:int64;
-	var [ -2:8 ]x:int64;
+	[ -2:8 ]x:int64
 do
+	[ q + 1 ]x := 12;
 	debugin m init;
 	debugin n init;
 	call divide(m, n, q init, r init);
+	debugout [2]x;
 	debugout q;
 	debugout r
 endprogram
