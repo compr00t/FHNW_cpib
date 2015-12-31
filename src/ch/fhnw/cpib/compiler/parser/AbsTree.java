@@ -15,7 +15,6 @@ import ch.fhnw.cpib.compiler.scanner.token.Mode.*;
 //import ch.fhnw.lederer.virtualmachineHS2010.IVirtualMachine.CodeTooSmallError;
 import ch.fhnw.cpib.compiler.context.GlobImp;
 import ch.fhnw.cpib.compiler.context.Procedure;
-import ch.fhnw.cpib.compiler.context.Record;
 import ch.fhnw.cpib.compiler.context.Routine;
 import ch.fhnw.cpib.compiler.context.Routine.RoutineTypes;
 import ch.fhnw.cpib.compiler.context.Scope;
