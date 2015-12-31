@@ -329,9 +329,9 @@ public interface ConcTree {
                     + "</TypedArr>\n";
         }
         
-        //public AbsTree.TypedArr toAbstract() {
-        //    return typeDeclaration.toAbstract(ident);
-        //}
+        public AbsTree.TypedIdent toAbstract() {
+            return typedIdent.toAbstract();
+        }
     }
     
     public class RangeVal {
@@ -352,9 +352,9 @@ public interface ConcTree {
                     + "</RangeVal>\n";
         }
         
-        //public AbsTree.RangeValAssi toAbstract() {
-        //    return new AbsTree.CmdAssi(expression.toAbstract(), nextExpression.toAbstract());
-        //}
+        public AbsTree.CmdAssi toAbstract(RepeatingOptionalCmds repCmd) {
+            return new AbsTree.CmdAssi(expression.toAbstract(), nextExpression.toAbstract(), repCmd.toAbstract());
+        }
     }
     
     
@@ -381,6 +381,7 @@ public interface ConcTree {
             return typeDeclaration.toAbstract(ident);
         }
     }
+    
     public abstract class TypeDeclaration {
         public abstract String toString(String indent);
         @SuppressWarnings("rawtypes")

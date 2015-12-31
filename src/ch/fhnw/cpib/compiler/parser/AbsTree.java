@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
 import ch.fhnw.cpib.compiler.scanner.enums.ModeAttributes;
 import ch.fhnw.cpib.compiler.scanner.enums.OperatorAttribute;
 import ch.fhnw.cpib.compiler.scanner.enums.Terminals;
@@ -1355,6 +1356,37 @@ public interface AbsTree {
         public Type getType() {
             return type;
         }
+    }
+    
+    public class TypedIdentArr extends TypedIdent<Type> {
+        private final RangeVal rangeVal;
+        //private final TypeIdent typeIdent;
+        
+        public TypedIdentArr() {
+        //public TypedIdentArr(Ident ident, Type type) {
+          //  this.ident = ident;
+           // this.type = type;
+            rangeVal=null;
+        }
+
+        public String toString(String indent) {
+          //  return indent + "<TypedIdentType>\n" + ident.toString(indent + '\t') + type.toString(indent + '\t') + indent
+          //          + "</TypedIdentType>\n";
+            return "";
+        }
+
+        @Override
+        public Ident getIdent() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Type getType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     }
 
     public abstract class Expression<T> {
