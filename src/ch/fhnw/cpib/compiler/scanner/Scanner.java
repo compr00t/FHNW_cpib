@@ -130,69 +130,74 @@ public class Scanner {
             if (ScannerSymbols.contains((int) c)) {
                 tmpHolder += c;
                 oldHolder = c;
-            } else if ('0' <= c && c <= '9' && (oldHolder == '-' || oldHolder == '+') && tmpHolder.length() == 1) {
+            } else if ('0' <= c && c <= '9' && (oldHolder == '-' || oldHolder == '+') ) {
                 currentState = State.LITERALSTATE;
-                tmpHolder += c;                
+                if(tmpHolder.length()!=1){
+                    parseSymbol(tmpHolder.substring(0, tmpHolder.length()-1), c, lineNumber, charNumber);
+                    tmpHolder = "";                
+                    tmpHolder += oldHolder;
+                }
+                
+                this.scanChar(c, lineNumber, charNumber);
+
+                
             } else if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || (' ' == c)
                     || ('\t' == c) || ('\u0003' == c) || ('\n' == c) || ('\r' == c)) {
+                
+                parseSymbol(tmpHolder, c, lineNumber, charNumber); 
+                tmpHolder = "";
+                currentState = State.INITIALSTATE;
+                this.scanChar(c, lineNumber, charNumber);
+                
+            }
+            break;
 
-                if (tmpHolder.length() >= 2) {
+        default:
+            throw new LexicalError("unknown char", c, lineNumber, charNumber);
+        }
+    }
+    
+    private void parseSymbol(String symbols, char c, int lineNumber, int charNumber) throws LexicalError{
+        if (symbols.length() >= 2) {
 
-                    IToken token;
+            IToken token;
 
-                    if (tmpHolder.charAt(0) == '<' || tmpHolder.charAt(0) == '>' || tmpHolder.charAt(0) == '&'
-                            || tmpHolder.charAt(0) == '|' || tmpHolder.charAt(0) == ':') {
-                        token = findSymbol(tmpHolder);
+            if (symbols.charAt(0) == '<' || symbols.charAt(0) == '>' || symbols.charAt(0) == '&'
+                    || symbols.charAt(0) == '|' || symbols.charAt(0) == ':') {
+                token = findSymbol(symbols);
+                if (token != null) {
+                    tokenList.add(token);
+                } else {
+                    for (char ch : symbols.toCharArray()) {
+                        token = findSymbol("" + ch);
                         if (token != null) {
-                            tokenList.add(token);
+                            tokenList.add(findSymbol("" + ch));
                         } else {
-                            for (char ch : tmpHolder.toCharArray()) {
-                                token = findSymbol("" + ch);
-                                if (token != null) {
-                                    tokenList.add(findSymbol("" + ch));
-                                } else {
-                                    throw new LexicalError("unknown char", c, lineNumber, charNumber);
-                                }
-                            }
-                        }
-                    } else {
-                        for (char ch : tmpHolder.toCharArray()) {
-                            token = findSymbol("" + ch);
-                            if (token != null) {
-                                tokenList.add(findSymbol("" + ch));
-                            } else {
-                                throw new LexicalError("unknown char", c, lineNumber, charNumber);
-                            }
+                            throw new LexicalError("unknown char", c, lineNumber, charNumber);
                         }
                     }
-
-                    tmpHolder = "";
-                    currentState = State.INITIALSTATE;
-                    this.scanChar(c, lineNumber, charNumber);
-
-                } else if (tmpHolder.length() == 1) {
-                    IToken token = findSymbol(tmpHolder);
+                }
+            } else {
+                for (char ch : symbols.toCharArray()) {
+                    token = findSymbol("" + ch);
                     if (token != null) {
-                        tokenList.add(token);
+                        tokenList.add(findSymbol("" + ch));
                     } else {
                         throw new LexicalError("unknown char", c, lineNumber, charNumber);
                     }
-
-                    tmpHolder = "";
-                    currentState = State.INITIALSTATE;
-                    this.scanChar(c, lineNumber, charNumber);
-
-                } else {
-                    throw new LexicalError("unknown char", c, lineNumber, charNumber);
                 }
+            }
+         
 
+        } else if (symbols.length() == 1) {
+            IToken token = findSymbol(symbols);
+            if (token != null) {
+                tokenList.add(token);
             } else {
                 throw new LexicalError("unknown char", c, lineNumber, charNumber);
             }
 
-            break;
-
-        default:
+        } else {
             throw new LexicalError("unknown char", c, lineNumber, charNumber);
         }
     }
