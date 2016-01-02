@@ -1381,7 +1381,7 @@ public interface AbsTree {
 
         @Override
         public String toString(String indent) {
-            return indent + "<ExprArray>\n" + expression.toString(indent + '\t') + indent + "\t<ArrayName>\n" + ident.toString(indent + '\t')
+            return indent + "<ExprArray>\n" + expression.toString(indent + '\t') + indent + "\t<ArrayName>\n" + ident.toString(indent + '\t' + '\t')
                    + indent + "\t</ArrayName>\n" + indent + "</ExprArray>\n";
         }
 
