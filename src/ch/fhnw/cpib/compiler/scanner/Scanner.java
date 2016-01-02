@@ -139,7 +139,6 @@ public class Scanner {
                 }
                 
                 this.scanChar(c, lineNumber, charNumber);
-
                 
             } else if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || (' ' == c)
                     || ('\t' == c) || ('\u0003' == c) || ('\n' == c) || ('\r' == c)) {
