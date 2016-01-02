@@ -197,32 +197,14 @@ public interface ConcTree {
         }
         
         public AbsTree.DeclarationStore toAbstract(RepeatingOptionalDeclarations repeatingOptionalDeclarations) {
-            return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedIdent.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
+            if(typedIdent==null){
+                return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedArr.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
+            }else{
+                return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedIdent.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
+            }
+            
         }
     }
-    
-//    public class ArrayDeclaration extends Declaration {
-//        private final OptionalChangeMode optionalChangeMode;
-//        private final TypedArr typedArr;
-//
-//        public ArrayDeclaration(OptionalChangeMode optionalChangeMode, TypedArr typedArr) {
-//            this.optionalChangeMode = optionalChangeMode;
-//            this.typedArr = typedArr;
-//        }
-//
-//        public String toString(String indent) {
-//            return indent
-//                    + "<StorageDeclaration>\n"
-//                    + optionalChangeMode.toString(indent + '\t')
-//                    + typedArr.toString(indent + '\t')
-//                    + indent
-//                    + "</StorageDeclaration>\n";
-//        }
-//        
-//        //public AbsTree.DeclarationStore toAbstract(RepeatingOptionalDeclarations repeatingOptionalDeclarations) {
-//        //    return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedArr.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
-//        //}
-//    }
     
     public class FunctionDeclaration extends Declaration {
         private final Ident ident;
@@ -329,6 +311,7 @@ public interface ConcTree {
                     + "</TypedArr>\n";
         }
         
+        @SuppressWarnings("rawtypes")
         public AbsTree.TypedIdent toAbstract() {
             return typedIdent.toAbstract();
         }
@@ -1335,6 +1318,7 @@ public interface ConcTree {
         }
         public AbsTree.Expression toAbstract(AbsTree.Expression expression) { return expression; }
     }
+    
     public class RepDOTOPRfactor {
         private final Operator dotOpr;
         private final Factor factor;
@@ -1429,9 +1413,9 @@ public interface ConcTree {
                     + "</FactorArray>\n";
         }
         
-        public AbsTree.Expression toAbstract() {
-            //return optionalIdent.toAbstract(ident);
-            return null;
+        public AbsTree.ExprArray toAbstract() {
+            return new AbsTree.ExprArray(ident, expression);
+            //return null;
         }
     }
     
@@ -1500,6 +1484,8 @@ public interface ConcTree {
             return expr.toAbstract();
         }
     }
+    
+    
     
     public abstract class OptionalIdent {
         public abstract String toString(String indent);

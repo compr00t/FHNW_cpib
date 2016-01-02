@@ -1357,37 +1357,6 @@ public interface AbsTree {
             return type;
         }
     }
-    
-    public class TypedIdentArr extends TypedIdent<Type> {
-        private final RangeVal rangeVal;
-        //private final TypeIdent typeIdent;
-        
-        public TypedIdentArr() {
-        //public TypedIdentArr(Ident ident, Type type) {
-          //  this.ident = ident;
-           // this.type = type;
-            rangeVal=null;
-        }
-
-        public String toString(String indent) {
-          //  return indent + "<TypedIdentType>\n" + ident.toString(indent + '\t') + type.toString(indent + '\t') + indent
-          //          + "</TypedIdentType>\n";
-            return "";
-        }
-
-        @Override
-        public Ident getIdent() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public Type getType() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-    }
 
     public abstract class Expression<T> {
         public abstract String toString(String indent);
@@ -1399,6 +1368,42 @@ public interface AbsTree {
         // abstract int code(int loc) throws CodeTooSmallError;
 
         abstract int getLine();
+    }
+    
+    public class ExprArray extends Expression{
+        private final Ident ident;
+        private final ConcTree.Expression expression;
+        
+        public ExprArray(Ident ident, ConcTree.Expression expression){
+            this.ident = ident;
+            this.expression = expression;
+        }
+
+        @Override
+        public String toString(String indent) {
+            return indent + "<ExprArray>\n" + expression.toString(indent + '\t') + indent + "\t<ArrayName>\n" + ident.toString(indent + '\t')
+                   + indent + "\t</ArrayName>\n" + indent + "</ExprArray>\n";
+        }
+
+        @Override
+        Object checkR() throws ContextError {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        Object checkL(boolean canInit) throws ContextError {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        int getLine() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+        
+        
     }
 
     public class ExprLiteral extends Expression<Type> {
@@ -1544,6 +1549,7 @@ public interface AbsTree {
         // return ((store != null && !store.isRecord()) ? store.codeRef(loc) : loc);
         // }
     }
+    
 
     public class ExprFunCall extends Expression {
         private final RoutineCall routineCall;
@@ -2046,4 +2052,5 @@ public interface AbsTree {
             nextGlobalImport.checkInit();
         }
     }
+
 }
