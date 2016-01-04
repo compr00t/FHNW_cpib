@@ -1099,6 +1099,39 @@ public interface AbsTree {
         public abstract T getType();
 
     }
+    
+    public class TypedIdentArr extends TypedIdent{
+        TypedIdent ti;
+        CmdAssi cmdAssi;
+        
+        
+        public TypedIdentArr(TypedIdent ti, CmdAssi cmdAssi){
+            this.ti = ti;
+            this.cmdAssi = cmdAssi;
+            
+        }
+        
+        @Override
+        public String toString(String indent) {
+            return indent + "<TypedArr>\n" + ti.toString(indent + '\t') + cmdAssi.toString(indent + '\t')
+                    + indent + "</TypedArr>\n";
+        }
+
+        @Override
+        public Ident getIdent() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Object getType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+
+        
+    }
 
     public class TypedIdentIdent extends TypedIdent<Ident> {
 
@@ -1161,11 +1194,11 @@ public interface AbsTree {
 
     public class ExprArray extends Expression {
         private final Ident ident;
-        private final ConcTree.Expression expression;
+        private final Expression expression;
 
-        public ExprArray(Ident ident, ConcTree.Expression expression) {
+        public ExprArray(Ident ident, Expression expression2) {
             this.ident = ident;
-            this.expression = expression;
+            this.expression = expression2;
         }
 
         @Override

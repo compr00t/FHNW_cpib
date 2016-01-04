@@ -1,5 +1,6 @@
 package ch.fhnw.cpib.compiler.parser;
 
+import ch.fhnw.cpib.compiler.parser.AbsTree.TypedIdentArr;
 import ch.fhnw.cpib.compiler.scanner.enums.ModeAttributes;
 import ch.fhnw.cpib.compiler.scanner.token.*;
 import ch.fhnw.cpib.compiler.scanner.token.Mode.*;
@@ -198,7 +199,7 @@ public interface ConcTree {
         
         public AbsTree.DeclarationStore toAbstract(RepeatingOptionalDeclarations repeatingOptionalDeclarations) {
             if(typedIdent==null){
-                return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedArr.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
+                return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedArr.toAbstract(null), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
             }else{
                 return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedIdent.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
             }
@@ -312,8 +313,8 @@ public interface ConcTree {
         }
         
         @SuppressWarnings("rawtypes")
-        public AbsTree.TypedIdent toAbstract() {
-            return typedIdent.toAbstract();
+        public AbsTree.TypedIdentArr toAbstract(RepeatingOptionalCmds repCmd) {
+            return new AbsTree.TypedIdentArr(typedIdent.toAbstract(), rangeVal.toAbstract(repCmd));
         }
     }
     
@@ -336,7 +337,7 @@ public interface ConcTree {
         }
         
         public AbsTree.CmdAssi toAbstract(RepeatingOptionalCmds repCmd) {
-            return new AbsTree.CmdAssi(expression.toAbstract(), nextExpression.toAbstract(), repCmd.toAbstract());
+            return new AbsTree.CmdAssi(expression.toAbstract(), nextExpression.toAbstract(), null);
         }
     }
     
@@ -1414,7 +1415,7 @@ public interface ConcTree {
         }
         
         public AbsTree.ExprArray toAbstract() {
-            return new AbsTree.ExprArray(ident, expression);
+            return new AbsTree.ExprArray(ident, expression.toAbstract());
             //return null;
         }
     }
