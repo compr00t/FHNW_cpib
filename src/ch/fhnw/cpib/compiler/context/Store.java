@@ -14,7 +14,6 @@ public final class Store extends Symbol {
     private final TypedIdent typedIdent;
     private boolean relative = false;
     private boolean reference = false;
-    private boolean isRecord = false;
 
     public Store(final String ident, final TypedIdent typedIdent, final boolean isConst) {
         super(ident, typedIdent);
@@ -23,8 +22,6 @@ public final class Store extends Symbol {
         this.writeable = true;
         this.initialized = false;
         this.isConst = isConst;
-        if (typedIdent instanceof TypedIdentIdent)
-            isRecord = true;
     }
 
     public boolean isConst() {
@@ -37,10 +34,6 @@ public final class Store extends Symbol {
 
     public boolean isInitialized() {
         return initialized;
-    }
-
-    public boolean isRecord() {
-        return isRecord;
     }
 
     public void initialize() {

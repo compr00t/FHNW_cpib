@@ -12,8 +12,7 @@ import ch.fhnw.cpib.compiler.scanner.enums.Terminals;
 import ch.fhnw.cpib.compiler.scanner.enums.TypeAttribute;
 import ch.fhnw.cpib.compiler.scanner.token.*;
 import ch.fhnw.cpib.compiler.scanner.token.Mode.*;
-//import ch.fhnw.lederer.virtualmachineHS2010.IVirtualMachine.HeapTooSmallError;
-//import ch.fhnw.lederer.virtualmachineHS2010.IVirtualMachine.CodeTooSmallError;
+import ch.fhnw.lederer.virtualmachineFS2015.*;
 import ch.fhnw.cpib.compiler.context.GlobImp;
 import ch.fhnw.cpib.compiler.context.Procedure;
 import ch.fhnw.cpib.compiler.context.Routine;
@@ -66,26 +65,25 @@ public interface AbsTree {
             return programParameter;
         }
 
-        // public int getLine(){
-        // return ident.getLine();
-        // }
+        public int getLine() {
+            return 0;
+        }
 
-        // public void check() throws ContextError, HeapTooSmallError {
-        // if(programParameter != null)
-        // programParameter.checkDeclaration();
-        // if(declaration != null)
-        // declaration.checkDeclaration();
-        // if(declaration != null)
-        // declaration.check(-1);
-        // Compiler.setScope(
-        // new Scope(Compiler.getGlobalStoreTable().clone()));
-        // cmd.check(false);
-        // }
+        public void check() throws ContextError {
+            if (programParameter != null)
+                programParameter.checkDeclaration();
+            if (declaration != null)
+                declaration.checkDeclaration();
+            if (declaration != null)
+                declaration.check(-1);
+            Compiler.setScope(new Scope(Compiler.getGlobalStoreTable().clone()));
+            cmd.check(false);
+        }
 
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // int loc1 = cmd.code(loc);
         // Compiler.getVM().Stop(loc1);
-        // if(declaration != null)
+        // if (declaration != null)
         // loc1 = declaration.code(loc1 + 1);
         // for (Routine routine : Compiler.getRoutineTable().getTable().values()) {
         // routine.codeCalls();
@@ -130,24 +128,21 @@ public interface AbsTree {
                     changeMode.getValue() == ModeAttributes.CONST);
         }
 
-        // public void checkDeclaration() throws ContextError, HeapTooSmallError {
-        // Store store = getStore();
-        // if (!Compiler.getGlobalStoreTable().addStore(store.getIdent(), store)) {
-        // throw new ContextError("Store already declared: "
-        // + typedIdent.getIdent().getName(), typedIdent.getIdent().getLine());
-        // }
-        // if (!store.isRecord()) {
-        // if (((TypedIdentType)typedIdent).getType().getAttribute() == TypeAttribute.BOOL) {
-        // store.setAddress(Compiler.getVM().BoolInitHeapCell());
-        // store.setRelative(false);
-        // } else {
-        // store.setAddress(Compiler.getVM().IntInitHeapCell());
-        // store.setRelative(false);
-        // }
-        // }
-        // if(nextProgramParameter!=null)
-        // nextProgramParameter.checkDeclaration();
-        // }
+        public void checkDeclaration() throws ContextError {
+            Store store = getStore();
+            if (!Compiler.getGlobalStoreTable().addStore(store.getIdent(), store)) {
+                throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue());
+            }
+            // if (((TypedIdentType) typedIdent).getType().getValue() == TypeAttribute.BOOL) {
+            // store.setAddress(Compiler.getVM().BoolInitHeapCell());
+            // store.setRelative(false);
+            // } else {
+            // store.setAddress(Compiler.getVM().IntInitHeapCell());
+            // store.setRelative(false);
+            // }
+            if (nextProgramParameter != null)
+                nextProgramParameter.checkDeclaration();
+        }
 
         public Store check() throws ContextError {
             Store store = getStore();
@@ -184,33 +179,11 @@ public interface AbsTree {
             return nextDecl;
         }
 
-        // public abstract void checkDeclaration() throws ContextError, HeapTooSmallError;
-        // public abstract int check(int locals) throws ContextError, HeapTooSmallError;
-        // public abstract int code(int loc) throws CodeTooSmallError;
-    }
+        public abstract void checkDeclaration() throws ContextError;
 
-    public class RecordField {
-        private final DeclarationRecordField declarationRecordField;
-        private final DeclarationRecordField nextDeclarationRecordField;
+        public abstract int check(int locals) throws ContextError;
 
-        public RecordField(DeclarationRecordField delcarationRecordField) {
-            this.declarationRecordField = delcarationRecordField;
-            this.nextDeclarationRecordField = declarationRecordField.getNextDeclarationRecordField();
-        }
-
-        public String toString(String indent) {
-            return indent + "<RecordField>\n" + declarationRecordField.toString(indent + '\t') + indent
-                    + "</RecordField>\n";
-        }
-
-        public DeclarationRecordField getDeclarationRecordField() {
-            return declarationRecordField;
-        }
-
-        public DeclarationRecordField getNextDeclarationRecordField() {
-            return nextDeclarationRecordField;
-        }
-
+        // public abstract int code(int loc);
     }
 
     public class DeclarationFunction extends Declaration {
@@ -264,17 +237,18 @@ public interface AbsTree {
             return returnDecl;
         }
 
-        // public void checkDeclaration() throws ContextError, HeapTooSmallError {
-        // if (nextDecl != null) nextDecl.checkDeclaration();
-        // }
+        public void checkDeclaration() throws ContextError {
+            if (nextDecl != null)
+                nextDecl.checkDeclaration();
+        }
 
-        // public int check(int locals) throws ContextError, HeapTooSmallError {
-        // return 0;
-        // }
+        public int check(int locals) throws ContextError {
+            return 0;
+        }
 
-        // public int code(int loc) throws CodeTooSmallError {
-        // return 0;
-        // }
+        public int code(int loc) {
+            return 0;
+        }
     }
 
     public class DeclarationProcedure extends Declaration {
@@ -334,66 +308,52 @@ public interface AbsTree {
             return cmd;
         }
 
-        // public void checkDeclaration() throws ContextError, HeapTooSmallError {
-        // Procedure procedure = new Procedure(
-        // ident.getName());
-        // Compiler.setScope(procedure.getScope());
-        //
-        // if (!Compiler.getRoutineTable().addRoutine(procedure)) {
-        // throw new ContextError("Ident already declared: "
-        // + ident.getName(), ident.getLine());
-        // }
+        public void checkDeclaration() throws ContextError {
+            Procedure procedure = new Procedure(ident.getValue());
+            Compiler.setScope(procedure.getScope());
 
-        // param.check(procedure);
-        // Compiler.setScope(null);
-        // if (nextDecl != null) nextDecl.checkDeclaration();
-        // }
+            if (!Compiler.getRoutineTable().addRoutine(procedure)) {
+                throw new ContextError("Ident already declared: " + ident.getValue());
+            }
 
-        // @Override
-        // public int check(final int locals)
-        // throws ContextError, HeapTooSmallError {
-        // if (locals >= 0) {
-        // throw new ContextError(
-        // "Function declarations are only allowed globally!",
-        // ident.getLine());
-        // }
-        // Routine routine = Compiler.getRoutineTable().getRoutine(
-        // ident.getName());
-        // Compiler.setScope(routine.getScope());
-        // if(globalImport != null)
-        // globalImport.check(routine);
-        // int localsCount = param.calculateAddress(routine.getParamList().size(), 0);
-        //
-        // if(decl!=null)
-        // decl.check(localsCount);
-        //
-        // cmd.check(false);
-        // Compiler.setScope(null);
-        // return -1;
-        // }
+            param.check(procedure);
+            Compiler.setScope(null);
+            if (nextDecl != null)
+                nextDecl.checkDeclaration();
+        }
 
-        // public int code(final int loc) throws CodeTooSmallError {
+        @Override
+        public int check(final int locals) throws ContextError {
+            if (locals >= 0) {
+                throw new ContextError("Function declarations are only allowed globally!");
+            }
+            Routine routine = Compiler.getRoutineTable().getRoutine(ident.getValue());
+            Compiler.setScope(routine.getScope());
+            if (globalImport != null)
+                globalImport.check(routine);
+            int localsCount = param.calculateAddress(routine.getParamList().size(), 0);
+
+            if (decl != null)
+                decl.check(localsCount);
+
+            cmd.check(false);
+            Compiler.setScope(null);
+            return -1;
+        }
+
+        // public int code(final int loc) {
         // int loc1 = loc;
-        // Routine routine = Compiler.getRoutineTable().getRoutine(
-        // ident.getName());
+        // Routine routine = Compiler.getRoutineTable().getRoutine(ident.getValue());
         // Compiler.setScope(routine.getScope());
         // routine.setAddress(loc1);
-        // Compiler.getVM().Enter(
-        // loc1++,
-        // routine.getInOutCopyCount() + getCount(),
-        // 0);
-        // loc1 = param.codeIn(
-        // loc1,
-        // routine.getParamList().size(),
-        // 0);
+        // Compiler.getVM().Enter(loc1++, routine.getInOutCopyCount() + getCount(), 0);
+        // loc1 = param.codeIn(loc1, routine.getParamList().size(), 0);
         // loc1 = cmd.code(loc1);
-        // loc1 = param.codeOut(loc1,
-        // routine.getParamList().size(),
-        // 0);
+        // loc1 = param.codeOut(loc1, routine.getParamList().size(), 0);
         // Compiler.getVM().Return(loc1++, 0);
         // Compiler.setScope(null);
         // return loc1;
-        // //return (nextDecl!=null?nextDecl.code(loc1):loc1);
+        // // return (nextDecl!=null?nextDecl.code(loc1):loc1);
         // }
     }
 
@@ -427,87 +387,30 @@ public interface AbsTree {
                     changeMode.getValue() == ModeAttributes.CONST);
         }
 
-        // @Override
-        // public int check(final int locals)
-        // throws ContextError, HeapTooSmallError {
-        // if (locals < 0) {
-        // return -1;
-        // } else {
-        // Store store = check();
-        // if (store.isRecord()) {
-        // return locals;
-        // } else {
-        // store.setAddress(2 + locals + 1);
-        // store.setRelative(true);
-        // store.setReference(false);
-        // return locals + 1;
-        // }
-        // }
-        // }
+        @Override
+        public int check(final int locals) throws ContextError {
+            if (locals < 0) {
+                return -1;
+            } else {
+                Store store = check();
+                store.setAddress(2 + locals + 1);
+                store.setRelative(true);
+                store.setReference(false);
+                return locals + 1;
+            }
+        }
 
-        // @Override
-        // public void checkDeclaration() throws ContextError, HeapTooSmallError {
-        // if (this.getTypedIdent() instanceof TypedIdentIdent) {
-        // if(Compiler.getGlobalStoreTable().containsIdent(typedIdent.getIdent().getName())) {
-        // throw new ContextError("Store already declared: "
-        // + typedIdent.getIdent().getName(), typedIdent.getIdent().getLine());
-        // }
-        // Ident record = (Ident)typedIdent.getType();
-        // if(!Compiler.getGlobalRecordTable().containsRecord(record.getName())) {
-        // throw new ContextError("Record is not declared: "
-        // + typedIdent.getIdent().getName(),
-        // + typedIdent.getIdent().getLine());
-        // }
-        //
-        // Record r = Compiler.getGlobalRecordTable().getRecord(record.getName());
-        // for (DeclarationRecordField recordField : r.getRecordFields()) {
-        // if (changeMode.getAttribute() == ModeAttribute.CONST &&
-        // recordField.getChangeMode().getAttribute() != changeMode.getAttribute())
-        // throw new ContextError("Store " + typedIdent.getIdent().getName()
-        // + " is defined as CONST but " + record.getName()
-        // + " contains a field " + recordField.getTypedIdent().getIdent().getName()
-        // + " which is not CONST", typedIdent.getIdent().getLine());
-        // Ident i = new Ident(typedIdent.getIdent().getName() + "." +
-        // recordField.getTypedIdent().getIdent().getName());
-        // TypedIdent t;
-        // if (recordField.getTypedIdent() instanceof TypedIdentIdent) {
-        // t = new TypedIdentIdent(i, ((TypedIdentIdent)recordField.getTypedIdent()).getType());
-        // } else {
-        // t = new TypedIdentType(i, ((TypedIdentType)recordField.getTypedIdent()).getType());
-        // }
-        // Store store = new Store(i.getName(), t,
-        // (recordField.getChangeMode().getAttribute()==ModeAttribute.CONST));
-        // if (((TypedIdentType)recordField.getTypedIdent()).getType().getAttribute() ==
-        // TypeAttribute.BOOL) {
-        // store.setAddress(Compiler.getVM().BoolInitHeapCell());
-        // store.setRelative(false);
-        // } else {
-        // store.setAddress(Compiler.getVM().IntInitHeapCell());
-        // store.setRelative(false);
-        // }
-        // Compiler.getGlobalStoreTable().addStore(i.getName(), store);
-        // }
-        // Compiler.getGlobalStoreTable().addStore(typedIdent.getIdent().getName(), getStore());
-        // Compiler.getGlobalIdentRecordTable().put(typedIdent.getIdent().getName(),
-        // record.getName());
-        // } else {
-        // Store store = getStore();
-        // if (!Compiler.getGlobalStoreTable().addStore(store.getIdent(), store)) {
-        // throw new ContextError("Store already declared: "
-        // + typedIdent.getIdent().getName(), typedIdent.getIdent().getLine());
-        // }
-        // if (!store.isRecord()) {
-        // if (((TypedIdentType)typedIdent).getType().getAttribute() == TypeAttribute.BOOL) {
-        // store.setAddress(Compiler.getVM().BoolInitHeapCell());
-        // store.setRelative(false);
-        // } else {
-        // store.setAddress(Compiler.getVM().IntInitHeapCell());
-        // store.setRelative(false);
-        // }
-        // }
-        // }
-        // if (nextDeclaration != null) nextDeclaration.checkDeclaration();
-        // }
+        @Override
+        public void checkDeclaration() throws ContextError {
+            if (this.getTypedIdent() instanceof TypedIdentIdent) {
+                Store store = getStore();
+                if (!Compiler.getGlobalStoreTable().addStore(store.getIdent(), store)) {
+                    throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue());
+                }
+            }
+            if (nextDeclaration != null)
+                nextDeclaration.checkDeclaration();
+        }
 
         public Store check() throws ContextError {
             Store store = getStore();
@@ -526,113 +429,9 @@ public interface AbsTree {
             return store;
         }
 
-        // public int code(final int loc) throws CodeTooSmallError {
-        // return loc;
-        // }
-    }
-
-    public class DeclarationRecord extends Declaration {
-        private final Ident ident;
-        private final RecordField recordField;
-        private final Declaration nextDeclaration;
-
-        public DeclarationRecord(Ident ident, RecordField recordField, Declaration nextDeclaration) {
-            super(nextDeclaration);
-            this.ident = ident;
-            this.recordField = recordField;
-            this.nextDeclaration = nextDeclaration;
+        public int code(final int loc) {
+            return loc;
         }
-
-        public String toString(final String indent) {
-            return indent + "<DeclarationRecord>\n" + ident.toString(indent + '\t')
-                    + recordField.toString(indent + '\t') + indent + "</DeclarationRecord>\n"
-                    + super.toString(indent + "\t");
-        }
-
-        public Ident getIdent() {
-            return ident;
-        }
-
-        public RecordField getRecordField() {
-            return recordField;
-        }
-
-        // public void checkDeclaration() throws ContextError, HeapTooSmallError {
-        // if(Compiler.getGlobalRecordTable().containsRecord(this.ident.getName())) {
-        // throw new ContextError("Record already declared: "
-        // + this.ident.getName(), this.ident.getLine());
-        // }
-        // ArrayList<DeclarationRecordField> recordFields = new ArrayList<DeclarationRecordField>();
-        // DeclarationRecordField currentRecordField = recordField.getDeclarationRecordField();
-        // currentRecordField.checkDeclaration();
-        // while (currentRecordField != null) {
-        // for(DeclarationRecordField r : recordFields) {
-        // if
-        // (r.getTypedIdent().getIdent().getName().equals(currentRecordField.getTypedIdent().getIdent().getName()))
-        // throw new ContextError("Field " + currentRecordField.getTypedIdent().getIdent().getName()
-        // + " in record " + this.ident.getName()
-        // + " already declared", currentRecordField.getTypedIdent().getIdent().getLine());
-        // }
-        // recordFields.add(currentRecordField);
-        // currentRecordField = currentRecordField.getNextDeclarationRecordField();
-        // }
-        // Record r = new Record(this.ident.getName(), recordFields);
-        // Compiler.getGlobalRecordTable().addRecord(r);
-        // if (nextDeclaration != null) nextDeclaration.checkDeclaration();
-        // }
-
-        // @Override
-        // public int check(int locals) throws ContextError, HeapTooSmallError {
-        // if (locals < 0) {
-        // return -1;
-        // } else {
-        // return locals;
-        // }
-        // }
-        //
-        // @Override
-        // public int code(int loc) throws CodeTooSmallError {
-        // return loc;
-        // }
-
-    }
-
-    public class DeclarationRecordField {
-        private final ChangeMode changeMode;
-        private final TypedIdent typedIdent;
-        private final DeclarationRecordField nextDeclarationRecordField;
-
-        public DeclarationRecordField(ChangeMode changeMode, TypedIdent typedIdent,
-                DeclarationRecordField nextDeclarationRecordField) {
-            this.changeMode = changeMode;
-            this.typedIdent = typedIdent;
-            this.nextDeclarationRecordField = nextDeclarationRecordField;
-        }
-
-        public String toString(final String indent) {
-            return indent + "<DeclarationRecordField>\n" + changeMode.toString(indent + '\t')
-                    + typedIdent.toString(indent + '\t') + indent + "</DeclarationRecordField>\n"
-                    + ((nextDeclarationRecordField != null) ? nextDeclarationRecordField.toString(indent + '\t') : "");
-        }
-
-        public ChangeMode getChangeMode() {
-            return changeMode;
-        }
-
-        public TypedIdent getTypedIdent() {
-            return typedIdent;
-        }
-
-        public DeclarationRecordField getNextDeclarationRecordField() {
-            return nextDeclarationRecordField;
-        }
-
-        public void checkDeclaration() throws ContextError {
-            if (typedIdent instanceof TypedIdentIdent)
-                throw new ContextError("Currently not allowed to set type of a field to a record. Field: "
-                        + typedIdent.getIdent().getValue());
-        }
-
     }
 
     public class Parameter {
@@ -712,29 +511,23 @@ public interface AbsTree {
             return (nextParam != null ? nextParam.calculateAddress(count - 1, locals1) : locals1);
         }
 
-        // public int codeIn(final int loc, final int count, final int locals)
-        // throws CodeTooSmallError {
+        // public int codeIn(final int loc, final int count, final int locals) {
         // int locals1 = locals;
         // int loc1 = loc;
-        // if (flowMode.getAttribute() != ModeAttribute.IN
-        // && mechMode.getAttribute() == ModeAttribute.COPY) {
-        // if (flowMode.getAttribute() == ModeAttribute.INOUT) {
+        // if (mechMode.getValue() == ModeAttributes.COPY) {
         // Compiler.getVM().CopyIn(loc1++, -count, 3 + locals1);
-        // }
         // locals1++;
         // }
-        // return (nextParam != null?nextParam.codeIn(loc1, count - 1, locals1):loc);
+        // return (nextParam != null ? nextParam.codeIn(loc1, count - 1, locals1) : loc);
         // }
 
-        // public int codeOut(final int loc, final int count, final int locals)
-        // throws CodeTooSmallError {
+        // public int codeOut(final int loc, final int count, final int locals) {
         // int locals1 = locals;
         // int loc1 = loc;
-        // if (flowMode.getAttribute() != ModeAttribute.IN
-        // && mechMode.getAttribute() == ModeAttribute.COPY) {
+        // if (mechMode.getValue() == ModeAttributes.COPY) {
         // Compiler.getVM().CopyOut(loc1++, 2 + ++locals1, -count);
         // }
-        // return (nextParam!=null?nextParam.codeOut(loc1, count - 1, locals1):loc);
+        // return (nextParam != null ? nextParam.codeOut(loc1, count - 1, locals1) : loc);
         // }
     }
 
@@ -770,7 +563,8 @@ public interface AbsTree {
         public abstract String toString(final String ident);
 
         public abstract void check(boolean canInit) throws ContextError;
-        // public abstract int code(int loc) throws CodeTooSmallError;
+
+        // public abstract int code(int loc);
     }
 
     public class CmdSkip extends Cmd {
@@ -805,8 +599,8 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(int loc) throws CodeTooSmallError {
-        // return (nextCmd!=null?nextCmd.code(loc):loc);
+        // public int code(int loc) {
+        // return (nextCmd != null ? nextCmd.code(loc) : loc);
         // }
     }
 
@@ -854,9 +648,6 @@ public interface AbsTree {
             if (tmp instanceof TypedIdentType) {
                 typeL = ((TypedIdentType) tmp).getType();
             } else {
-                if (tmp instanceof TypedIdentIdent)
-                    throw new ContextError("Only record fields can be used in assingments. Record "
-                            + ((TypedIdentIdent) tmp).getIdent().getValue() + " cannot be part of an assignment");
                 typeL = (Type) tmp;
             }
 
@@ -877,16 +668,14 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // if (sourceExpression instanceof ExprDyadic
-        // && ((ExprDyadic) sourceExpression).getOperator().getValue() ==
-        // OperatorAttribute.DOT) {
+        // && ((ExprDyadic) sourceExpression).getOperator().getValue() == OperatorAttribute.DOT) {
         // sourceExpression = (ExprStore) ((ExprDyadic) sourceExpression).getExpr1();
         // }
         //
         // if (targetExpression instanceof ExprDyadic
-        // && ((ExprDyadic) targetExpression).getOperator().getValue() ==
-        // OperatorAttribute.DOT) {
+        // && ((ExprDyadic) targetExpression).getOperator().getValue() == OperatorAttribute.DOT) {
         // targetExpression = (ExprStore) ((ExprDyadic) targetExpression).getExpr1();
         // }
         //
@@ -990,7 +779,7 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // int loc1 = expression.code(loc);
         // int loc2 = ifCmd.code(loc1 + 1);
         // Compiler.getVM().CondJump(loc1, loc2 + 1);
@@ -1055,7 +844,7 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // int loc1 = expression.code(loc);
         // int loc2 = cmd.code(loc1 + 1);
         // Compiler.getVM().CondJump(loc1, loc2 + 1);
@@ -1145,10 +934,10 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // int loc1 = loc;
         // loc1 = routineCall.getExprList().code(loc1);
-        // Compiler.getRoutineTable().getRoutine(routineCall.getIdent().getName()).addCall(loc1++);
+        // Compiler.getRoutineTable().getRoutine(routineCall.getIdent().getValue()).addCall(loc1++);
         // return (nextCmd != null ? nextCmd.code(loc1) : loc1);
         // }
     }
@@ -1205,10 +994,10 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // int loc1;
-        // if (expr instanceof ExprDyadic
-        // && ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT) {
+        // if (expr instanceof ExprDyadic && ((ExprDyadic) expr).getOperator().getValue() ==
+        // OperatorAttribute.DOT) {
         // ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
         // expr = expr1;
         // loc1 = ((ExprStore) expr).codeRef(loc);
@@ -1277,10 +1066,10 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // int loc1;
-        // if (expr instanceof ExprDyadic
-        // && ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT) {
+        // if (expr instanceof ExprDyadic && ((ExprDyadic) expr).getOperator().getValue() ==
+        // OperatorAttribute.DOT) {
         // ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
         // ExprStore expr2 = (ExprStore) ((ExprDyadic) expr).getExpr2();
         // Store store = (Store) Compiler.getGlobalStoreTable()
@@ -1292,7 +1081,7 @@ public interface AbsTree {
         // loc1 = ((ExprStore) expr).code(loc);
         // }
         //
-        // if (type.getAttribute() == TypeAttribute.BOOL) {
+        // if (type.getValue() == TypeAttribute.BOOL) {
         // Compiler.getVM().BoolOutput(loc1++, ((ExprStore) expr).getIdent().getValue());
         // } else {
         // Compiler.getVM().IntOutput(loc1++, ((ExprStore) expr).getIdent().getValue());
@@ -1365,24 +1154,24 @@ public interface AbsTree {
 
         abstract T checkL(boolean canInit) throws ContextError;
 
-        // abstract int code(int loc) throws CodeTooSmallError;
+        // abstract int code(int loc);
 
         abstract int getLine();
     }
-    
-    public class ExprArray extends Expression{
+
+    public class ExprArray extends Expression {
         private final Ident ident;
         private final ConcTree.Expression expression;
-        
-        public ExprArray(Ident ident, ConcTree.Expression expression){
+
+        public ExprArray(Ident ident, ConcTree.Expression expression) {
             this.ident = ident;
             this.expression = expression;
         }
 
         @Override
         public String toString(String indent) {
-            return indent + "<ExprArray>\n" + expression.toString(indent + '\t') + indent + "\t<ArrayName>\n" + ident.toString(indent + '\t' + '\t')
-                   + indent + "\t</ArrayName>\n" + indent + "</ExprArray>\n";
+            return indent + "<ExprArray>\n" + expression.toString(indent + '\t') + indent + "\t<ArrayName>\n"
+                    + ident.toString(indent + '\t' + '\t') + indent + "\t</ArrayName>\n" + indent + "</ExprArray>\n";
         }
 
         @Override
@@ -1402,8 +1191,13 @@ public interface AbsTree {
             // TODO Auto-generated method stub
             return 0;
         }
-        
-        
+
+        // @Override
+        // int code(int loc) {
+        // // TODO Auto-generated method stub
+        // return 0;
+        // }
+
     }
 
     public class ExprLiteral extends Expression<Type> {
@@ -1437,7 +1231,7 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // Compiler.getVM().IntLoad(loc, literal.getLiteral());
         // return loc + 1;
         // }
@@ -1509,10 +1303,6 @@ public interface AbsTree {
 
             if (isInit) {
 
-                if (store.isRecord()) {
-                    throw new ContextError("Records cannot yet be directly initialized");
-                }
-
                 if (canInit) {
                     throw new ContextError("Store can not be initialized here " + "(loop or inout parameter)!");
                 }
@@ -1523,7 +1313,7 @@ public interface AbsTree {
 
                 store.initialize();
 
-            } else if (!store.isInitialized() && !store.isRecord()) {
+            } else if (!store.isInitialized()) {
                 throw new ContextError("Store " + ident.getValue() + " is not initialized");
             } else if (!store.isWriteable()) {
                 throw new ContextError("Store " + ident.getValue() + " is not writeable");
@@ -1539,17 +1329,16 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
-        // return ((store != null && !store.isRecord()) ? store.codeLoad(loc) : loc);
+        // return ((store != null) ? store.codeLoad(loc) : loc);
         // }
         //
-        // public int codeRef(final int loc) throws CodeTooSmallError {
+        // public int codeRef(final int loc) {
         // Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
-        // return ((store != null && !store.isRecord()) ? store.codeRef(loc) : loc);
+        // return ((store != null) ? store.codeRef(loc) : loc);
         // }
     }
-    
 
     public class ExprFunCall extends Expression {
         private final RoutineCall routineCall;
@@ -1577,7 +1366,7 @@ public interface AbsTree {
         }
 
         // @Override
-        // int code(int loc) throws CodeTooSmallError {
+        // int code(int loc) {
         // return 0;
         // }
 
@@ -1619,7 +1408,7 @@ public interface AbsTree {
         }
 
         // @Override
-        // int code(int loc) throws CodeTooSmallError {
+        // int code(int loc) {
         // // TODO Auto-generated method stub
         // return 0;
         // }
@@ -1774,11 +1563,11 @@ public interface AbsTree {
         }
 
         // @Override
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // int loc1 = expr1.code(loc);
         //
-        // if (operator.getValue() != OperatorAttribute.CAND
-        // && operator.getValue() != OperatorAttribute.COR) {
+        // if (operator.getValue() != OperatorAttribute.CAND && operator.getValue() !=
+        // OperatorAttribute.COR) {
         // loc1 = expr2.code(loc1);
         //
         // switch (operator.getValue()) {
@@ -1936,10 +1725,9 @@ public interface AbsTree {
                 expressionList.check(paramList, aliasList, canInit);
         }
 
-        // public int code(final int loc) throws CodeTooSmallError {
+        // public int code(final int loc) {
         // int loc1;
-        // if (param.getFlowMode().getAttribute() == ModeAttribute.IN
-        // && param.getMechMode().getAttribute() == ModeAttribute.COPY) {
+        // if (param.getMechMode().getValue() == ModeAttributes.COPY) {
         // loc1 = expression.code(loc);
         // } else {
         // loc1 = ((ExprStore) expression).codeRef(loc);

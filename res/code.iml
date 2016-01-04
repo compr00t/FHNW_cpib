@@ -7,7 +7,7 @@ global
 		r init := m;
 		while r >= n do
 			q := q + 1;
-			[ 4 ] x := 75 + 1;
+			[4]x := 75 + 1;
 			r := r - n
 		endwhile
 	endproc;

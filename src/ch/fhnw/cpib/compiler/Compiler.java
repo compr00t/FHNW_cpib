@@ -9,29 +9,31 @@ import java.io.StringReader;
 import ch.fhnw.cpib.compiler.context.RoutineTable;
 import ch.fhnw.cpib.compiler.context.Scope;
 import ch.fhnw.cpib.compiler.context.StoreTable;
+import ch.fhnw.cpib.compiler.exception.ContextError;
 import ch.fhnw.cpib.compiler.exception.GrammarError;
 import ch.fhnw.cpib.compiler.parser.AbsTree;
 import ch.fhnw.cpib.compiler.parser.ConcTree;
 import ch.fhnw.cpib.compiler.parser.Parser;
 import ch.fhnw.cpib.compiler.scanner.ITokenList;
 import ch.fhnw.cpib.compiler.scanner.Scanner;
+import ch.fhnw.lederer.virtualmachineFS2015.*;
 
 public final class Compiler {
+    
+    private static final int STORE_SIZE = 1000;
 
     private static RoutineTable routineTable = new RoutineTable();
     private static StoreTable globalStoreTable = new StoreTable();
-    // private static RecordTable globalRecordTable = new RecordTable();
-    // private static HashMap<String, String> globalIdentRecordTable = new HashMap<String,
-    // String>();
     private static Scope scope = null;
+    private static IVirtualMachine vm /*= new VirtualMachine(null, STORE_SIZE)*/;
 
+    public static IVirtualMachine getVM() {
+        return vm;
+    }
+    
     public static StoreTable getGlobalStoreTable() {
         return globalStoreTable;
     }
-
-    // public static RecordTable getGlobalRecordTable() {
-    // return globalRecordTable;
-    // }
 
     public static RoutineTable getRoutineTable() {
         return routineTable;
@@ -45,15 +47,11 @@ public final class Compiler {
         Compiler.scope = scope;
     }
 
-    // public static HashMap<String, String> getGlobalIdentRecordTable() {
-    // return globalIdentRecordTable;
-    // }
-
     private Compiler() {
         throw new AssertionError("Instantiating utility class...");
     }
 
-    public static void compile(BufferedReader source) throws IOException, GrammarError {
+    public static void compile(BufferedReader source) throws IOException, GrammarError, ContextError {
 
         System.out.println("> Code: \n");
         String currentLine = "";
@@ -87,6 +85,9 @@ public final class Compiler {
         
         final AbsTree.Program absTree = concTree.toAbstract();
         System.out.println(absTree.toString());
+        
+        System.out.println(" > Checker:\n");
+        absTree.check();
     }
 
     public static void main(String[] args) {
