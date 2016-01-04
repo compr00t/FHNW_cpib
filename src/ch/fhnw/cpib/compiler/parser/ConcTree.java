@@ -199,7 +199,7 @@ public interface ConcTree {
         
         public AbsTree.DeclarationStore toAbstract(RepeatingOptionalDeclarations repeatingOptionalDeclarations) {
             if(typedIdent==null){
-                return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedArr.toAbstract(null), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
+                return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedArr.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
             }else{
                 return new AbsTree.DeclarationStore(optionalChangeMode.toAbstract(), typedIdent.toAbstract(), (repeatingOptionalDeclarations!=null?repeatingOptionalDeclarations.toAbstract():null));
             }
@@ -313,8 +313,8 @@ public interface ConcTree {
         }
         
         @SuppressWarnings("rawtypes")
-        public AbsTree.TypedIdentArr toAbstract(RepeatingOptionalCmds repCmd) {
-            return new AbsTree.TypedIdentArr(typedIdent.toAbstract(), rangeVal.toAbstract(repCmd));
+        public AbsTree.TypedIdentArr toAbstract() {
+            return new AbsTree.TypedIdentArr(typedIdent.toAbstract(), rangeVal.toAbstract());
         }
     }
     
@@ -336,12 +336,10 @@ public interface ConcTree {
                     + "</RangeVal>\n";
         }
         
-        public AbsTree.CmdAssi toAbstract(RepeatingOptionalCmds repCmd) {
+        public AbsTree.CmdAssi toAbstract() {
             return new AbsTree.CmdAssi(expression.toAbstract(), nextExpression.toAbstract(), null);
         }
     }
-    
-    
 
     public class TypedIdent {
         private final Ident ident;

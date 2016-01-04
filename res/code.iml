@@ -20,7 +20,7 @@ global
 do
 	debugin m init;
 	debugin n init;
-	debugin [5]x;
+	debugin [5+x]x;
 	call divide(m, n, q init, r init);
 	debugout q;
 	debugout r
