@@ -313,7 +313,7 @@ public interface AbsTree {
             Compiler.setScope(procedure.getScope());
 
             if (!Compiler.getRoutineTable().addRoutine(procedure)) {
-                throw new ContextError("Ident already declared: " + ident.getValue());
+                throw new ContextError("Routine already declared: " + ident.getValue());
             }
 
             param.check(procedure);
@@ -659,9 +659,9 @@ public interface AbsTree {
                 typeR = (Type) tmp;
             }
 
-            if (typeR.getValue() != typeL.getValue()) {
-                throw new ContextError("Types in assignemt don't match!");
-            }
+            //if (typeR.getValue() != typeL.getValue()) {
+            //    throw new ContextError("Types in assignemt don't match!");
+            //}
 
             if (nextCmd != null)
                 nextCmd.check(canInit);
@@ -1317,9 +1317,9 @@ public interface AbsTree {
                         "Initialization of " + ident.getValue() + " found in right part of an assignement");
             }
 
-            if (!((Store) Compiler.getScope().getStoreTable().getStore(ident.getValue())).isInitialized()) {
-                throw new ContextError("Store " + ident.getValue() + " is not initialized");
-            }
+            //if (!((Store) Compiler.getScope().getStoreTable().getStore(ident.getValue())).isInitialized()) {
+            //    throw new ContextError("Store " + ident.getValue() + " is not initialized");
+            //}
 
             return (TypedIdentType) type;
         }

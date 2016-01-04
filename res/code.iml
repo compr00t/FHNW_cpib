@@ -2,15 +2,25 @@ program intDiv()
 global
 	proc divide(copy m:int64, copy n:int64, copy x:int64, ref var q:int64, ref var r:int64)
 	do
+	
+		// Store q is not initialized
+		// q := 0;
+	
 		q init := 0 + 1;
 		[-5]x := 15;
 		r init := m;
 		while r >= n do
 			q := q + 1;
-			[4]x := 75 + 1;
+			[4] x := 75 + 1;
 			r := r - n
 		endwhile
 	endproc;
+	
+	// Routine already declared: divide
+	//proc divide(copy m:int64, copy n:int64, ref var q:int64, ref var r:int64)
+	//do
+	//	q init := 0
+	//endproc;
 
 	var m:int64;
 	var n:int64;
@@ -20,7 +30,7 @@ global
 do
 	debugin m init;
 	debugin n init;
-	debugin [5+x]x;
+	debugin [5]x;
 	call divide(m, n, q init, r init);
 	debugout q;
 	debugout r

@@ -25,8 +25,8 @@ public final class Compiler {
     private static RoutineTable routineTable = new RoutineTable();
     private static StoreTable globalStoreTable = new StoreTable();
     private static Scope scope = null;
-    private static IVirtualMachine vm /*= new VirtualMachine(null, STORE_SIZE)*/;
-
+    private static IVirtualMachine vm /*= new VirtualMachine(null, STORE_SIZE)*/;    
+    
     public static IVirtualMachine getVM() {
         return vm;
     }
