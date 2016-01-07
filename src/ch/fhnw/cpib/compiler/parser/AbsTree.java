@@ -23,9 +23,14 @@ import ch.fhnw.cpib.compiler.context.Store;
 import ch.fhnw.cpib.compiler.exception.ContextError;
 import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
 import ch.fhnw.cpib.compiler.Compiler;
+import ch.fhnw.lederer.virtualmachineFS2015.CodeArray;
+import ch.fhnw.lederer.virtualmachineFS2015.ICodeArray;
+import ch.fhnw.lederer.virtualmachineFS2015.ICodeArray.CodeTooSmallError;
+import ch.fhnw.lederer.virtualmachineFS2015.IInstructions;
+import ch.fhnw.lederer.virtualmachineFS2015.IInstructions.*;
 
 public interface AbsTree {
-
+    
 	public class Program {
 		private final Ident ident;
 		private final Declaration declaration;
@@ -82,17 +87,18 @@ public interface AbsTree {
 			cmd.check(false);
 		}
 
-		// public int code(final int loc) {
-		// int loc1 = cmd.code(loc);
-		// Compiler.getVM().Stop(loc1);
-		// if (declaration != null)
-		// loc1 = declaration.code(loc1 + 1);
-		// for (Routine routine :
-		// Compiler.getRoutineTable().getTable().values()) {
-		// routine.codeCalls();
-		// }
-		// return loc1;
-		// }
+		public int code(final int loc) throws CodeTooSmallError {
+		    
+		     int loc1 = cmd.code(loc);
+             Compiler.getcodeArray().put(loc1, new Stop());;
+             if (declaration != null)
+             loc1 = declaration.code(loc1 + 1);
+             for (Routine routine :
+                 Compiler.getRoutineTable().getTable().values()) {
+                 routine.codeCalls();
+             }
+             return loc1;
+        }
 
 	}
 
@@ -137,15 +143,9 @@ public interface AbsTree {
 				throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue(),
 						typedIdent.getIdent().getLine());
 			}
-
-			// if (((TypedIdentType) typedIdent).getType().getValue() ==
-			// TypeAttribute.BOOL) {
-			// store.setAddress(Compiler.getVM().BoolInitHeapCell());
-			// store.setRelative(false);
-			// } else {
-			// store.setAddress(Compiler.getVM().IntInitHeapCell());
-			// store.setRelative(false);
-			// }
+			
+			
+			
 			if (nextProgramParameter != null)
 				nextProgramParameter.checkDeclaration();
 		}
@@ -189,7 +189,7 @@ public interface AbsTree {
 
 		public abstract int check(int locals) throws ContextError;
 
-		// public abstract int code(int loc);
+		public abstract int code(int loc) throws CodeTooSmallError;
 	}
 
 	public class DeclarationFunction extends Declaration {
@@ -347,22 +347,22 @@ public interface AbsTree {
 			return -1;
 		}
 
-		// public int code(final int loc) {
-		// int loc1 = loc;
-		// Routine routine =
-		// Compiler.getRoutineTable().getRoutine(ident.getValue());
-		// Compiler.setScope(routine.getScope());
-		// routine.setAddress(loc1);
-		// Compiler.getVM().Enter(loc1++, routine.getInOutCopyCount() +
-		// getCount(), 0);
-		// loc1 = param.codeIn(loc1, routine.getParamList().size(), 0);
-		// loc1 = cmd.code(loc1);
-		// loc1 = param.codeOut(loc1, routine.getParamList().size(), 0);
-		// Compiler.getVM().Return(loc1++, 0);
-		// Compiler.setScope(null);
-		// return loc1;
-		// // return (nextDecl!=null?nextDecl.code(loc1):loc1);
-		// }
+        public int code(final int loc) throws CodeTooSmallError {
+            int loc1 = loc;
+            Routine routine = Compiler.getRoutineTable().getRoutine(ident.getValue());
+            Compiler.setScope(routine.getScope());
+            routine.setAddress(loc1);
+            //Compiler.getVM().Enter(loc1++, routine.getInOutCopyCount() + getCount(), 0);
+            Compiler.getcodeArray().put(loc1, new AllocBlock(1));
+            //loc1 = param.codeIn(loc1, routine.getParamList().size(), 0);
+            loc1 = cmd.code(loc1);
+            //loc1 = param.codeOut(loc1, routine.getParamList().size(), 0);
+            //Compiler.getVM().Return(loc1++, 0);
+            Compiler.getcodeArray().put(loc1, new Return(1));
+            Compiler.setScope(null);
+            return loc1;
+            // return (nextDecl!=null?nextDecl.code(loc1):loc1);
+        }
 	}
 
 	public class DeclarationStore extends Declaration {
@@ -608,7 +608,7 @@ public interface AbsTree {
 
 		public abstract void check(boolean canInit) throws ContextError;
 
-		// public abstract int code(int loc);
+		public abstract int code(int loc) throws CodeTooSmallError;
 	}
 
 	public class CmdSkip extends Cmd {
@@ -642,10 +642,11 @@ public interface AbsTree {
 				nextCmd.check(canInit);
 		}
 
-		// @Override
-		// public int code(int loc) {
-		// return (nextCmd != null ? nextCmd.code(loc) : loc);
-		// }
+
+         @Override
+         public int code(int loc) throws CodeTooSmallError {
+             return (nextCmd != null ? nextCmd.code(loc) : loc);
+         }
 	}
 
 	public class CmdAssi extends Cmd {
@@ -724,31 +725,28 @@ public interface AbsTree {
 				nextCmd.check(canInit);
 		}
 
-		// @Override
-		// public int code(final int loc) {
-		// if (sourceExpression instanceof ExprDyadic
-		// && ((ExprDyadic) sourceExpression).getOperator().getValue() ==
-		// OperatorAttribute.DOT) {
-		// sourceExpression = (ExprStore) ((ExprDyadic)
-		// sourceExpression).getExpr1();
-		// }
-		//
-		// if (targetExpression instanceof ExprDyadic
-		// && ((ExprDyadic) targetExpression).getOperator().getValue() ==
-		// OperatorAttribute.DOT) {
-		// targetExpression = (ExprStore) ((ExprDyadic)
-		// targetExpression).getExpr1();
-		// }
-		//
-		// int loc1 = sourceExpression.code(loc);
-		// if (!(targetExpression instanceof ExprStore)) {
-		// loc1 = targetExpression.code(loc1);
-		// } else {
-		// loc1 = ((ExprStore) targetExpression).codeRef(loc1);
-		// Compiler.getVM().Store(loc1++);
-		// }
-		// return (nextCmd != null ? nextCmd.code(loc1) : loc1);
-		// }
+        @Override
+        public int code(final int loc) throws CodeTooSmallError {
+            if (sourceExpression instanceof ExprDyadic
+                    && ((ExprDyadic) sourceExpression).getOperator().getValue() == OperatorAttribute.DOT) {
+                sourceExpression = (ExprStore) ((ExprDyadic) sourceExpression).getExpr1();
+            }
+
+            if (targetExpression instanceof ExprDyadic
+                    && ((ExprDyadic) targetExpression).getOperator().getValue() == OperatorAttribute.DOT) {
+                targetExpression = (ExprStore) ((ExprDyadic) targetExpression).getExpr1();
+            }
+
+            int loc1 = sourceExpression.code(loc);
+            if (!(targetExpression instanceof ExprStore)) {
+                loc1 = targetExpression.code(loc1);
+            } else {
+                loc1 = ((ExprStore) targetExpression).codeRef(loc1);
+                //Compiler.getVM().Store(loc1++);
+                Compiler.getcodeArray().put(loc1++, new IInstructions.Store());
+            }
+            return (nextCmd != null ? nextCmd.code(loc1) : loc1);
+        }
 	}
 
 	public class CmdCond extends Cmd {
@@ -841,15 +839,17 @@ public interface AbsTree {
 				nextCmd.check(canInit);
 		}
 
-		// @Override
-		// public int code(final int loc) {
-		// int loc1 = expression.code(loc);
-		// int loc2 = ifCmd.code(loc1 + 1);
-		// Compiler.getVM().CondJump(loc1, loc2 + 1);
-		// int loc3 = elseCmd.code(loc2 + 1);
-		// Compiler.getVM().UncondJump(loc2, loc3);
-		// return (nextCmd != null ? nextCmd.code(loc3) : loc3);
-		// }
+        @Override
+        public int code(final int loc) throws CodeTooSmallError {
+            int loc1 = expression.code(loc);
+            int loc2 = ifCmd.code(loc1 + 1);
+            //Compiler.getVM().CondJump(loc1, loc2 + 1);
+            Compiler.getcodeArray().put(loc1, new CondJump(loc2+1));
+            int loc3 = elseCmd.code(loc2 + 1);
+            //Compiler.getVM().UncondJump(loc2, loc3);
+            Compiler.getcodeArray().put(loc2, new UncondJump(loc3));
+            return (nextCmd != null ? nextCmd.code(loc3) : loc3);
+        }
 	}
 
 	public class CmdWhile extends Cmd {
@@ -908,14 +908,16 @@ public interface AbsTree {
 				nextCmd.check(canInit);
 		}
 
-		// @Override
-		// public int code(final int loc) {
-		// int loc1 = expression.code(loc);
-		// int loc2 = cmd.code(loc1 + 1);
-		// Compiler.getVM().CondJump(loc1, loc2 + 1);
-		// Compiler.getVM().UncondJump(loc2, loc);
-		// return (nextCmd != null ? nextCmd.code(loc2 + 1) : (loc2 + 1));
-		// }
+        @Override
+        public int code(final int loc) throws CodeTooSmallError {
+            int loc1 = expression.code(loc);
+            int loc2 = cmd.code(loc1 + 1);
+            //Compiler.getVM().CondJump(loc1, loc2 + 1);
+            //Compiler.getVM().UncondJump(loc2, loc);
+            Compiler.getcodeArray().put(loc1, new CondJump(loc2+1));
+            Compiler.getcodeArray().put(loc2, new UncondJump(loc));
+            return (nextCmd != null ? nextCmd.code(loc2 + 1) : (loc2 + 1));
+        }
 	}
 
 	public class CmdProcCall extends Cmd {
@@ -999,13 +1001,13 @@ public interface AbsTree {
 				nextCmd.check(canInit);
 		}
 
-		// @Override
-		// public int code(final int loc) {
-		// int loc1 = loc;
-		// loc1 = routineCall.getExprList().code(loc1);
-		// Compiler.getRoutineTable().getRoutine(routineCall.getIdent().getValue()).addCall(loc1++);
-		// return (nextCmd != null ? nextCmd.code(loc1) : loc1);
-		// }
+        @Override
+        public int code(final int loc) throws CodeTooSmallError {
+            int loc1 = loc;
+            loc1 = routineCall.getExprList().code(loc1);
+            Compiler.getRoutineTable().getRoutine(routineCall.getIdent().getValue()).addCall(loc1++);
+            return (nextCmd != null ? nextCmd.code(loc1) : loc1);
+        }
 	}
 
 	public class CmdInput extends Cmd {
@@ -1062,28 +1064,26 @@ public interface AbsTree {
 				nextCmd.check(canInit);
 		}
 
-		// @Override
-		// public int code(final int loc) {
-		// int loc1;
-		// if (expr instanceof ExprDyadic && ((ExprDyadic)
-		// expr).getOperator().getValue() ==
-		// OperatorAttribute.DOT) {
-		// ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
-		// expr = expr1;
-		// loc1 = ((ExprStore) expr).codeRef(loc);
-		// } else {
-		// loc1 = ((ExprStore) expr).codeRef(loc);
-		// }
-		//
-		// if (type.getValue() == TypeAttribute.BOOL) {
-		// Compiler.getVM().BoolInput(loc1++, ((ExprStore)
-		// expr).getIdent().getValue());
-		// } else {
-		// Compiler.getVM().IntInput(loc1++, ((ExprStore)
-		// expr).getIdent().getValue());
-		// }
-		// return (nextCmd != null ? nextCmd.code(loc1) : loc1);
-		// }
+        @Override
+        public int code(final int loc) throws CodeTooSmallError {
+            int loc1;
+            if (expr instanceof ExprDyadic && ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT) {
+                ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
+                expr = expr1;
+                loc1 = ((ExprStore) expr).codeRef(loc);
+            } else {
+                loc1 = ((ExprStore) expr).codeRef(loc);
+            }
+
+            if (type.getValue() == TypeAttribute.BOOL) {
+                //Compiler.getVM().BoolInput(loc1++, ((ExprStore) expr).getIdent().getValue());
+                Compiler.getcodeArray().put(loc1++, new InputBool(((ExprStore) expr).getIdent().getValue()));
+            } else {
+                //Compiler.getVM().IntInput(loc1++, ((ExprStore) expr).getIdent().getValue());
+                Compiler.getcodeArray().put(loc1++, new InputInt(((ExprStore) expr).getIdent().getValue()));
+            }
+            return (nextCmd != null ? nextCmd.code(loc1) : loc1);
+        }
 	}
 
 	public class CmdOutput extends Cmd {
@@ -1139,33 +1139,30 @@ public interface AbsTree {
 				nextCmd.check(canInit);
 		}
 
-		// @Override
-		// public int code(final int loc) {
-		// int loc1;
-		// if (expr instanceof ExprDyadic && ((ExprDyadic)
-		// expr).getOperator().getValue() ==
-		// OperatorAttribute.DOT) {
-		// ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
-		// ExprStore expr2 = (ExprStore) ((ExprDyadic) expr).getExpr2();
-		// Store store = (Store) Compiler.getGlobalStoreTable()
-		// .getStore(expr2.getIdent().getValue() + "." +
-		// expr1.getIdent().getValue());
-		// expr1.setIdent(store.getType().getIdent());
-		// expr = expr1;
-		// loc1 = expr.code(loc);
-		// } else {
-		// loc1 = ((ExprStore) expr).code(loc);
-		// }
-		//
-		// if (type.getValue() == TypeAttribute.BOOL) {
-		// Compiler.getVM().BoolOutput(loc1++, ((ExprStore)
-		// expr).getIdent().getValue());
-		// } else {
-		// Compiler.getVM().IntOutput(loc1++, ((ExprStore)
-		// expr).getIdent().getValue());
-		// }
-		// return (nextCmd != null ? nextCmd.code(loc1) : loc1);
-		// }
+        @Override
+        public int code(final int loc) throws CodeTooSmallError {
+            int loc1;
+            if (expr instanceof ExprDyadic && ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT) {
+                ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
+                ExprStore expr2 = (ExprStore) ((ExprDyadic) expr).getExpr2();
+                Store store = (Store) Compiler.getGlobalStoreTable().getStore(
+                        expr2.getIdent().getValue() + "." + expr1.getIdent().getValue());
+                expr1.setIdent(store.getType().getIdent());
+                expr = expr1;
+                loc1 = expr.code(loc);
+            } else {
+                loc1 = ((ExprStore) expr).code(loc);
+            }
+
+            if (type.getValue() == TypeAttribute.BOOL) {
+                //Compiler.getVM().BoolOutput(loc1++, ((ExprStore) expr).getIdent().getValue());
+                Compiler.getcodeArray().put(loc1++, new InputBool(((ExprStore) expr).getIdent().getValue()));
+            } else {
+                //Compiler.getVM().IntOutput(loc1++, ((ExprStore) expr).getIdent().getValue());
+                Compiler.getcodeArray().put(loc1++, new InputInt(((ExprStore) expr).getIdent().getValue()));
+            }
+            return (nextCmd != null ? nextCmd.code(loc1) : loc1);
+        }
 	}
 
 	public abstract class TypedIdent<T> {
@@ -1262,7 +1259,7 @@ public interface AbsTree {
 
 		abstract String getValue();
 
-		// abstract int code(int loc);
+		abstract int code(int loc) throws CodeTooSmallError;
 
 		abstract int getLine();
 	}
@@ -1372,11 +1369,11 @@ public interface AbsTree {
 			return ident.getLine();
 		}
 
-		// @Override
-		// int code(int loc) {
-		// // TODO Auto-generated method stub
-		// return 0;
-		// }
+        @Override
+        int code(int loc) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
 
 	}
 
@@ -1416,11 +1413,12 @@ public interface AbsTree {
 			return literal.getIntVal() + "";
 		}
 
-		// @Override
-		// public int code(final int loc) {
-		// Compiler.getVM().IntLoad(loc, literal.getLiteral());
-		// return loc + 1;
-		// }
+        @Override
+        public int code(final int loc) throws CodeTooSmallError {
+            //Compiler.getVM().IntLoad(loc, literal.getLiteral());
+            Compiler.getcodeArray().put(loc, new LoadImInt(literal.getLiteral()));
+            return loc + 1;
+        }
 	}
 
 	public class ExprStore extends Expression<TypedIdent> {
@@ -1528,18 +1526,16 @@ public interface AbsTree {
 			return ident.getValue();
 		}
 
-		// @Override
-		// public int code(final int loc) {
-		// Store store = (Store)
-		// Compiler.getScope().getStoreTable().getStore(ident.getValue());
-		// return ((store != null) ? store.codeLoad(loc) : loc);
-		// }
-		//
-		// public int codeRef(final int loc) {
-		// Store store = (Store)
-		// Compiler.getScope().getStoreTable().getStore(ident.getValue());
-		// return ((store != null) ? store.codeRef(loc) : loc);
-		// }
+        @Override
+        public int code(final int loc) throws CodeTooSmallError {
+            Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
+            return ((store != null) ? store.codeLoad(loc) : loc);
+        }
+
+        public int codeRef(final int loc) throws CodeTooSmallError {
+            Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
+            return ((store != null) ? store.codeRef(loc) : loc);
+        }
 	}
 
 	public class ExprFunCall extends Expression {
@@ -1567,10 +1563,10 @@ public interface AbsTree {
 			return null;
 		}
 
-		// @Override
-		// int code(int loc) {
-		// return 0;
-		// }
+        @Override
+        int code(int loc) {
+            return 0;
+        }
 
 		@Override
 		int getLine() {
@@ -1614,11 +1610,11 @@ public interface AbsTree {
 			return null;
 		}
 
-		// @Override
-		// int code(int loc) {
-		// // TODO Auto-generated method stub
-		// return 0;
-		// }
+        @Override
+        int code(int loc) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
 
 		@Override
 		int getLine() {
@@ -1781,71 +1777,87 @@ public interface AbsTree {
 			}
 		}
 
-		// @Override
-		// public int code(final int loc) {
-		// int loc1 = expr1.code(loc);
-		//
-		// if (operator.getValue() != OperatorAttribute.CAND &&
-		// operator.getValue() !=
-		// OperatorAttribute.COR) {
-		// loc1 = expr2.code(loc1);
-		//
-		// switch (operator.getValue()) {
-		// case DOT:
-		// break;
-		// case PLUS:
-		// Compiler.getVM().IntAdd(loc1);
-		// break;
-		// case MINUS:
-		// Compiler.getVM().IntSub(loc1);
-		// break;
-		// case TIMES:
-		// Compiler.getVM().IntMult(loc1);
-		// break;
-		// case DIV:
-		// Compiler.getVM().IntDiv(loc1);
-		// break;
-		// case MOD:
-		// Compiler.getVM().IntMod(loc1);
-		// break;
-		// case EQ:
-		// Compiler.getVM().IntEQ(loc1);
-		// break;
-		// case NE:
-		// Compiler.getVM().IntNE(loc1);
-		// break;
-		// case GT:
-		// Compiler.getVM().IntGT(loc1);
-		// break;
-		// case LT:
-		// Compiler.getVM().IntLT(loc1);
-		// break;
-		// case GE:
-		// Compiler.getVM().IntGE(loc1);
-		// break;
-		// case LE:
-		// Compiler.getVM().IntLE(loc1);
-		// break;
-		// default:
-		// throw new RuntimeException();
-		// }
-		//
-		// return loc1 + 1;
-		// } else if (operator.getValue() == OperatorAttribute.CAND) {
-		// int loc2 = expr2.code(loc1 + 1);
-		// Compiler.getVM().UncondJump(loc2++, loc2 + 1);
-		// Compiler.getVM().CondJump(loc1, loc2);
-		// Compiler.getVM().IntLoad(loc2++, 0);
-		// return loc2;
-		// } else {
-		// int loc2 = expr2.code(loc1 + 2);
-		// Compiler.getVM().UncondJump(loc2++, loc2 + 1);
-		// Compiler.getVM().CondJump(loc1, loc1 + 2);
-		// Compiler.getVM().UncondJump(loc1 + 1, loc2);
-		// Compiler.getVM().IntLoad(loc2++, 1);
-		// return loc2;
-		// }
-		// }
+        @Override
+        public int code(final int loc) throws CodeTooSmallError {
+            int loc1 = expr1.code(loc);
+
+            if (operator.getValue() != OperatorAttribute.CAND && operator.getValue() != OperatorAttribute.COR) {
+                loc1 = expr2.code(loc1);
+
+                switch (operator.getValue()) {
+                case DOT:
+                    break;
+                case PLUS:
+                    //Compiler.getVM().IntAdd(loc1);
+                    Compiler.getcodeArray().put(loc1, new AddInt());
+                    break;
+                case MINUS:
+                    //Compiler.getVM().IntSub(loc1);
+                    Compiler.getcodeArray().put(loc1, new SubInt());
+                    break;
+                case TIMES:
+                    //Compiler.getVM().IntMult(loc1);
+                    Compiler.getcodeArray().put(loc1, new MultInt());
+                    break;
+                case DIV:
+                    //Compiler.getVM().IntDiv(loc1);
+                    Compiler.getcodeArray().put(loc1, new DivTruncInt());
+                    break;
+                case MOD:
+                    //Compiler.getVM().IntMod(loc1);
+                    Compiler.getcodeArray().put(loc1, new ModTruncInt());
+                    break;
+                case EQ:
+                    //Compiler.getVM().IntEQ(loc1);
+                    Compiler.getcodeArray().put(loc1, new EqInt());
+                    break;
+                case NE:
+                    //Compiler.getVM().IntNE(loc1);
+                    Compiler.getcodeArray().put(loc1, new NeInt());
+                    break;
+                case GT:
+                    //Compiler.getVM().IntGT(loc1);
+                    Compiler.getcodeArray().put(loc1, new LtInt());
+                    break;
+                case LT:
+                    //Compiler.getVM().IntLT(loc1);
+                    Compiler.getcodeArray().put(loc1, new GeInt());
+                    break;
+                case GE:
+                    //Compiler.getVM().IntGE(loc1);
+                    Compiler.getcodeArray().put(loc1, new GtInt());
+                    break;
+                case LE:
+                    //Compiler.getVM().IntLE(loc1);
+                    Compiler.getcodeArray().put(loc1, new LeInt());
+                    break;
+                default:
+                    throw new RuntimeException();
+                }
+
+                return loc1 + 1;
+            } else if (operator.getValue() == OperatorAttribute.CAND) {
+                int loc2 = expr2.code(loc1 + 1);
+//                Compiler.getVM().UncondJump(loc2++, loc2 + 1);
+//                Compiler.getVM().CondJump(loc1, loc2);
+//                Compiler.getVM().IntLoad(loc2++, 0);
+                Compiler.getcodeArray().put(loc2++, new UncondJump(loc2 + 1));
+                Compiler.getcodeArray().put(loc1, new CondJump(loc2));
+                Compiler.getcodeArray().put(loc2++, new LoadImInt(0));
+                return loc2;
+            } else {
+                int loc2 = expr2.code(loc1 + 2);
+//                Compiler.getVM().UncondJump(loc2++, loc2 + 1);
+//                Compiler.getVM().CondJump(loc1, loc1 + 2);
+//                Compiler.getVM().UncondJump(loc1 + 1, loc2);
+//                Compiler.getVM().IntLoad(loc2++, 1);
+                Compiler.getcodeArray().put(loc2++, new UncondJump(loc2 + 1));
+                Compiler.getcodeArray().put(loc1, new CondJump(loc1 + 2));
+                Compiler.getcodeArray().put(loc1 + 1, new UncondJump(loc2));
+                Compiler.getcodeArray().put(loc2++, new LoadImInt(1));
+                return loc2;
+            }
+        }
 
 		public void setError(final ContextError contextError) {
 			error = contextError;
@@ -1954,16 +1966,16 @@ public interface AbsTree {
 				expressionList.check(paramList, aliasList, canInit);
 		}
 
-		// public int code(final int loc) {
-		// int loc1;
-		// if (param.getMechMode().getValue() == ModeAttributes.COPY) {
-		// loc1 = expression.code(loc);
-		// } else {
-		// loc1 = ((ExprStore) expression).codeRef(loc);
-		// }
-		//
-		// return (expressionList != null ? expressionList.code(loc1) : loc1);
-		// }
+        public int code(final int loc) throws CodeTooSmallError {
+            int loc1;
+            if (param.getMechMode().getValue() == ModeAttributes.COPY) {
+                loc1 = expression.code(loc);
+            } else {
+                loc1 = ((ExprStore) expression).codeRef(loc);
+            }
+
+            return (expressionList != null ? expressionList.code(loc1) : loc1);
+        }
 	}
 
 	public final class GlobalInit {

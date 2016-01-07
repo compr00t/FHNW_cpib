@@ -5,7 +5,8 @@ import java.util.List;
 
 import ch.fhnw.cpib.compiler.scanner.enums.ModeAttributes;
 import ch.fhnw.cpib.compiler.Compiler;
-//import ch.fhnw.lederer.virtualmachineHS2010.IVirtualMachine.CodeTooSmallError;
+import ch.fhnw.lederer.virtualmachineFS2015.ICodeArray.CodeTooSmallError;
+import ch.fhnw.lederer.virtualmachineFS2015.IInstructions.*;
 
 public class Routine {
 
@@ -37,11 +38,11 @@ public class Routine {
 		calls.add(loc);
 	}
 	
-	//public final void codeCalls() throws CodeTooSmallError {
-	//	for (int loc : calls) {
-	//		Compiler.getVM().Call(loc, address);
-	//	}
-	//}
+	public final void codeCalls() throws CodeTooSmallError {
+		for (int loc : calls) {
+			Compiler.getcodeArray().put(loc, new Call(address));;
+		}
+	}
 	
 	public final Scope getScope() {
 		return scope;

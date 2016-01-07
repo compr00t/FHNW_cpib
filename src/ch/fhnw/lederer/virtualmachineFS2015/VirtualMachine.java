@@ -57,6 +57,7 @@ public class VirtualMachine implements IVirtualMachine {
         this.code= new IExecInstr[code.getSize()];
         for (int i= 0; i < code.getSize(); i++) {
             this.code[i]= code.get(i).toExecInstr(this);
+            System.out.println(this.code[i]);
         }
     }
 

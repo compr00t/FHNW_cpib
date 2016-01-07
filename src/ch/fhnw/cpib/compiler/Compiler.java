@@ -18,16 +18,19 @@ import ch.fhnw.cpib.compiler.parser.Parser;
 import ch.fhnw.cpib.compiler.scanner.ITokenList;
 import ch.fhnw.cpib.compiler.scanner.Scanner;
 import ch.fhnw.lederer.virtualmachineFS2015.*;
+import ch.fhnw.lederer.virtualmachineFS2015.ICodeArray.CodeTooSmallError;
+import ch.fhnw.lederer.virtualmachineFS2015.IVirtualMachine.ExecutionError;
 
 public final class Compiler {
     
-    private static final int STORE_SIZE = 1000;
+    private static final int STORE_SIZE = 1024;
 
     private static RoutineTable routineTable = new RoutineTable();
     private static StoreTable globalStoreTable = new StoreTable();
     private static StoreTable arrayRangeTable = new StoreTable();
     private static Scope scope = null;
-    private static IVirtualMachine vm /*= new VirtualMachine(null, STORE_SIZE)*/;    
+    private static IVirtualMachine vm /*= new VirtualMachine(null, STORE_SIZE)*/; 
+    private static CodeArray codeArray = new CodeArray(STORE_SIZE);
     
     public static IVirtualMachine getVM() {
         return vm;
@@ -52,6 +55,10 @@ public final class Compiler {
     public static Scope getScope() {
         return scope;
     }
+    
+    public static ICodeArray getcodeArray() {
+        return codeArray;
+    }
 
     public static void setScope(final Scope scope) {
         Compiler.scope = scope;
@@ -61,7 +68,7 @@ public final class Compiler {
         throw new AssertionError("Instantiating utility class...");
     }
 
-    public static void compile(BufferedReader source) throws IOException, GrammarError, ContextError {
+    public static void compile(BufferedReader source) throws IOException, GrammarError, ContextError, ExecutionError, CodeTooSmallError {
 
         System.out.println("> Code: \n");
         String currentLine = "";
@@ -100,6 +107,12 @@ public final class Compiler {
         absTree.check();
         
         System.out.println("No error found!");
+        
+        System.out.println(" > Generating Code:\n");
+        absTree.code(0);
+        codeArray.resize();
+        vm = new VirtualMachine(codeArray, STORE_SIZE);
+        
     }
 
     public static void main(String[] args) {

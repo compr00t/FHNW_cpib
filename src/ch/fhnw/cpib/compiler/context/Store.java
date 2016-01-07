@@ -3,7 +3,8 @@ package ch.fhnw.cpib.compiler.context;
 import ch.fhnw.cpib.compiler.parser.AbsTree.TypedIdent;
 import ch.fhnw.cpib.compiler.parser.AbsTree.TypedIdentIdent;
 import ch.fhnw.cpib.compiler.Compiler;
-//import ch.fhnw.lederer.virtualmachineHS2010.IVirtualMachine.CodeTooSmallError;
+import ch.fhnw.lederer.virtualmachineFS2015.ICodeArray.*;
+import ch.fhnw.lederer.virtualmachineFS2015.IInstructions.*;
 
 public final class Store extends Symbol {
     private boolean initialized;
@@ -58,27 +59,31 @@ public final class Store extends Symbol {
         this.reference = reference;
     }
 
-    //public int codeLoad(final int loc) throws CodeTooSmallError {
-    //    int loc1 = codeRef(loc);
-    //    Compiler.getVM().Deref(loc1++);
-    //    return loc1;
-    //}
+    public int codeLoad(final int loc) throws CodeTooSmallError {
+        int loc1 = codeRef(loc);
+        //Compiler.getVM().Deref(loc1++);
+        Compiler.getcodeArray().put(loc1++, new Deref());
+        return loc1;
+    }
 
-    //public int codeRef(final int loc) throws CodeTooSmallError {
-    //    int loc1 = loc;
+    public int codeRef(final int loc) throws CodeTooSmallError {
+        int loc1 = loc;
 
-    //    if (relative) {
-    //        Compiler.getVM().LoadRel(loc1++, address);
-    //    } else {
-    //        Compiler.getVM().IntLoad(loc1++, address);
-    //    }
+        if (relative) {
+            //Compiler.getVM().LoadRel(loc1++, address);
+            Compiler.getcodeArray().put(loc1++, new LoadAddrRel(address));
+        } else {
+            //Compiler.getVM().IntLoad(loc1++, address);
+            Compiler.getcodeArray().put(loc1++, new LoadImInt(address));
+        }
 
-    //    if (reference) {
-    //        Compiler.getVM().Deref(loc1++);
-    //    }
+        if (reference) {
+            //Compiler.getVM().Deref(loc1++);
+            Compiler.getcodeArray().put(loc1++, new Deref());
+        }
 
-    //    return loc1;
-    //}
+        return loc1;
+    }
 
     public Store clone() {
         Store store = new Store(this.getIdent(), this.getType(), this.isConst);
