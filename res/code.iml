@@ -1,6 +1,8 @@
 program intDiv()
 global
 	proc divide(copy m:int64, copy n:int64, ref var q:int64, ref var r:int64)
+	
+	// terminal expected: DO, terminal found: IDENT
 	do
 	
 		// Store q is not initialized
@@ -14,6 +16,9 @@ global
 		endwhile
 	endproc;
 	
+	// unknown char @
+	// @@
+	
 	// Routine already declared: divide
 	// proc divide(copy m:int64, copy n:int64, ref var q:int64, ref var r:int64)
 	// do
@@ -26,7 +31,7 @@ global
 	var [-8:10]x:int64;
 	
 	//Store already declared: x
-	//var [0:10]x:int64;
+	// var [0:10]x:int64;
 	
 	var r:int64
 do
