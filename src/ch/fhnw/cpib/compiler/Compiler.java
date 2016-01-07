@@ -88,6 +88,8 @@ public final class Compiler {
         
         System.out.println(" > Checker:\n");
         absTree.check();
+        
+        System.out.println("No error found!");
     }
 
     public static void main(String[] args) {
