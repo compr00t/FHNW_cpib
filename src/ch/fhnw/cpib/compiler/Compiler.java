@@ -9,6 +9,7 @@ import java.io.StringReader;
 import ch.fhnw.cpib.compiler.context.RoutineTable;
 import ch.fhnw.cpib.compiler.context.Scope;
 import ch.fhnw.cpib.compiler.context.StoreTable;
+import ch.fhnw.cpib.compiler.context.Range;
 import ch.fhnw.cpib.compiler.exception.ContextError;
 import ch.fhnw.cpib.compiler.exception.GrammarError;
 import ch.fhnw.cpib.compiler.parser.AbsTree;
@@ -24,11 +25,20 @@ public final class Compiler {
 
     private static RoutineTable routineTable = new RoutineTable();
     private static StoreTable globalStoreTable = new StoreTable();
+    private static StoreTable arrayRangeTable = new StoreTable();
     private static Scope scope = null;
     private static IVirtualMachine vm /*= new VirtualMachine(null, STORE_SIZE)*/;    
     
     public static IVirtualMachine getVM() {
         return vm;
+    }
+    
+    public static StoreTable getArrayStoreTable() {
+    	return arrayRangeTable;
+    }
+    
+    public static void addArrayStoreTable(String name, Range range) {
+    	arrayRangeTable.addStore(name, range);
     }
     
     public static StoreTable getGlobalStoreTable() {

@@ -8,6 +8,8 @@ public class ContextError extends Exception {
 
     public ContextError(String message) {
         super();
+    	//System.out.println("ERROR: " + message);
+    	//System.exit(1);
         this.message = message;
     }
 

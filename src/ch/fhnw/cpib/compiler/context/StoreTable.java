@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import ch.fhnw.cpib.compiler.parser.AbsTree.TypedIdent;
+import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
 
 @SuppressWarnings("rawtypes")
 public final class StoreTable {
@@ -17,7 +18,7 @@ public final class StoreTable {
 	}
 	
 	public boolean addStore(final String key, final Object s) {
-		if (s instanceof ArrayList<?> || s instanceof Store) {
+		if (s instanceof ArrayList<?> || s instanceof Store || s instanceof Range) {
 			if (!storeMap.containsKey(key)) {
 				storeMap.put(key, s);
 				return true;

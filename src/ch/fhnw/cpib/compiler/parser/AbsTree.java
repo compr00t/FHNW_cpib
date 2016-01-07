@@ -5,21 +5,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
+//import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
 import ch.fhnw.cpib.compiler.scanner.enums.ModeAttributes;
 import ch.fhnw.cpib.compiler.scanner.enums.OperatorAttribute;
 import ch.fhnw.cpib.compiler.scanner.enums.Terminals;
 import ch.fhnw.cpib.compiler.scanner.enums.TypeAttribute;
 import ch.fhnw.cpib.compiler.scanner.token.*;
 import ch.fhnw.cpib.compiler.scanner.token.Mode.*;
-import ch.fhnw.lederer.virtualmachineFS2015.*;
+//import ch.fhnw.lederer.virtualmachineFS2015.*;
 import ch.fhnw.cpib.compiler.context.GlobImp;
 import ch.fhnw.cpib.compiler.context.Procedure;
+import ch.fhnw.cpib.compiler.context.Range;
 import ch.fhnw.cpib.compiler.context.Routine;
 import ch.fhnw.cpib.compiler.context.Routine.RoutineTypes;
 import ch.fhnw.cpib.compiler.context.Scope;
 import ch.fhnw.cpib.compiler.context.Store;
 import ch.fhnw.cpib.compiler.exception.ContextError;
+import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
 import ch.fhnw.cpib.compiler.Compiler;
 
 public interface AbsTree {
@@ -134,6 +136,7 @@ public interface AbsTree {
 			if (!Compiler.getGlobalStoreTable().addStore(store.getIdent(), store)) {
 				throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue());
 			}
+			
 			// if (((TypedIdentType) typedIdent).getType().getValue() ==
 			// TypeAttribute.BOOL) {
 			// store.setAddress(Compiler.getVM().BoolInitHeapCell());
@@ -417,6 +420,13 @@ public interface AbsTree {
 					throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue());
 				}
 			}
+			
+			if (this.getTypedIdent() instanceof TypedIdentArr) {
+				int start = Integer.parseInt(((TypedIdentArr) typedIdent).cmdAssi.getStart());
+				int end = Integer.parseInt(((TypedIdentArr) typedIdent).cmdAssi.getEnd());
+				Compiler.addArrayStoreTable(typedIdent.getIdent().getValue(), new Range(start, end));
+			}
+			
 			if (nextDeclaration != null)
 				nextDeclaration.checkDeclaration();
 		}
@@ -651,6 +661,14 @@ public interface AbsTree {
 
 		public Expression getTargetExpression() {
 			return targetExpression;
+		}
+		
+		public String getStart() {
+			return targetExpression.getValue();
+		}
+		
+		public String getEnd() {
+			return sourceExpression.getValue();
 		}
 
 		public Expression getSourceExpression() {
@@ -1159,7 +1177,6 @@ public interface AbsTree {
 			this.ti = ti;
 			this.cmdAssi = cmdAssi;
 			//this.rangeval = rangeval;
-
 		}
 
 		@Override
@@ -1233,6 +1250,8 @@ public interface AbsTree {
 		abstract T checkR() throws ContextError;
 
 		abstract T checkL(boolean canInit) throws ContextError;
+		
+		abstract String getValue();
 
 		// abstract int code(int loc);
 
@@ -1248,6 +1267,14 @@ public interface AbsTree {
 			this.ident = ident;
 			this.expression = expression2;
 		}
+		
+		public Ident getIdent() {
+			return ident;
+		}
+		
+		public String getValue() {
+			return ident.getValue();
+		}
 
 		@Override
 		public String toString(String indent) {
@@ -1260,11 +1287,7 @@ public interface AbsTree {
 			TypedIdent type = Compiler.getScope().getType(ident.getValue());
 
 			if (type == null) {
-				throw new ContextError("Ident " + ident.getValue() + " not declared");
-			}
-
-			if (type instanceof TypedIdentIdent) {
-				throw new ContextError("Records cannot be used here. " + " Record " + ident.getValue());
+				throw new ContextError("Array " + ident.getValue() + " not declared");
 			}
 
 			if (isInit && !(type instanceof TypedIdentArr)) {
@@ -1278,6 +1301,15 @@ public interface AbsTree {
 			// throw new ContextError("Store " + ident.getValue() + " is not
 			// initialized");
 			// }
+			
+			if (type instanceof TypedIdentArr) {
+				Range range = (Range) Compiler.getArrayStoreTable().getStore(ident.getValue());
+				int value = Integer.parseInt(expression.getValue());
+				
+				if (range.getStart() > value || value > range.getEnd()) {
+					throw new ContextError("Index out of bound exception for array " + ident.getValue());
+				}
+			}
 
 			return new TypedIdentType(type.getIdent(), (Type) type.getType());
 		}
@@ -1288,7 +1320,7 @@ public interface AbsTree {
 			TypedIdent type = Compiler.getScope().getType(ident.getValue());
 
 			if (type == null) {
-				throw new ContextError("Ident " + ident.getValue() + " not declared");
+				throw new ContextError("Array " + ident.getValue() + " not declared");
 			}
 
 			Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
@@ -1309,6 +1341,15 @@ public interface AbsTree {
 				throw new ContextError("Store " + ident.getValue() + " is not initialized");
 			} else if (!store.isWriteable()) {
 				throw new ContextError("Store " + ident.getValue() + " is not writeable");
+			}
+			
+			if (type instanceof TypedIdentArr) {
+				Range range = (Range) Compiler.getArrayStoreTable().getStore(ident.getValue());
+				int value = Integer.parseInt(expression.getValue());
+				
+				if (range.getStart() > value || value > range.getEnd()) {
+					throw new ContextError("Index out of bound exception for array " + ident.getValue());
+				}
 			}
 
 			return type;
@@ -1356,6 +1397,11 @@ public interface AbsTree {
 		@Override
 		int getLine() {
 			return 0;
+		}
+
+		@Override
+		String getValue() {
+			return literal.getIntVal() + "";
 		}
 
 		// @Override
@@ -1464,6 +1510,11 @@ public interface AbsTree {
 			return 0;
 		}
 
+		@Override
+		String getValue() {
+			return ident.getValue();
+		}
+
 		// @Override
 		// public int code(final int loc) {
 		// Store store = (Store)
@@ -1512,6 +1563,11 @@ public interface AbsTree {
 		int getLine() {
 			return 0;
 		}
+
+		@Override
+		String getValue() {
+			return null;
+		}
 	}
 
 	public class ExprMonadic extends Expression {
@@ -1554,6 +1610,12 @@ public interface AbsTree {
 		@Override
 		int getLine() {
 			return 0;
+		}
+
+		@Override
+		String getValue() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
@@ -1779,6 +1841,12 @@ public interface AbsTree {
 			// TODO Auto-generated method stub
 			return 0;
 		}
+
+		@Override
+		String getValue() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	public class RoutineCall {
@@ -1973,7 +2041,7 @@ public interface AbsTree {
 			if (!Compiler.getScope().getStoreTable().addStore(localStore.getType().getIdent().getValue(), localStore)) {
 				throw new ContextError("Global ident already used! Ident: " + ident.getValue());
 			}
-
+			
 			localStore.initialize();
 
 			routine.addGlobImp(new GlobImp(getChangeMode(), ident.getValue()));
