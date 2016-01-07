@@ -1,17 +1,9 @@
 package ch.fhnw.cpib.compiler.exception;
 
 public class GrammarError extends Exception{
-
-    private static final long serialVersionUID = 1L;
-    private final String message;
     
-    public GrammarError(String message){
-        super();
-        this.message = message;
+    public GrammarError(String message, int lineNumber){
+    	System.out.println("["+ lineNumber + " - ContextError] " + message);
+    	System.exit(1);
     }
-
-    public String getMessage(){
-        return message+ ".";
-    }
-
 }

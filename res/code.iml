@@ -26,7 +26,7 @@ global
 	var [-8:10]x:int64;
 	
 	//Store already declared: x
-	// var [0:10]x:int64;
+	//var [0:10]x:int64;
 	
 	var r:int64
 do
@@ -46,7 +46,7 @@ do
 	// Ident y not declared
 	// call divide(m, [5]y, q init, r init);
 	
-	call divide(m, [5]x, q init, r init);
+	call divide(m, [-2]x, q init, r init);
 	debugout q;
 	debugout r
 endprogram

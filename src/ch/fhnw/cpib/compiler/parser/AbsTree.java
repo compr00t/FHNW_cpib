@@ -68,7 +68,7 @@ public interface AbsTree {
 		}
 
 		public int getLine() {
-			return 0;
+			return ident.getLine();
 		}
 
 		public void check() throws ContextError {
@@ -134,9 +134,10 @@ public interface AbsTree {
 		public void checkDeclaration() throws ContextError {
 			Store store = getStore();
 			if (!Compiler.getGlobalStoreTable().addStore(store.getIdent(), store)) {
-				throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue());
+				throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue(),
+						typedIdent.getIdent().getLine());
 			}
-			
+
 			// if (((TypedIdentType) typedIdent).getType().getValue() ==
 			// TypeAttribute.BOOL) {
 			// store.setAddress(Compiler.getVM().BoolInitHeapCell());
@@ -155,11 +156,11 @@ public interface AbsTree {
 			Ident ident = typedIdent.getIdent();
 			if (t instanceof TypedIdentIdent) {
 				if (!Compiler.getScope().getStoreTable().addStore(ident.getValue(), store)) {
-					throw new ContextError("Ident already declared: " + ident.getValue());
+					throw new ContextError("Ident already declared: " + ident.getValue(), ident.getLine());
 				}
 			} else {
 				if (!Compiler.getScope().getStoreTable().addStore(ident.getValue(), store)) {
-					throw new ContextError("Ident already declared: " + ident.getValue());
+					throw new ContextError("Ident already declared: " + ident.getValue(), ident.getLine());
 				}
 			}
 
@@ -318,7 +319,7 @@ public interface AbsTree {
 			Compiler.setScope(procedure.getScope());
 
 			if (!Compiler.getRoutineTable().addRoutine(procedure)) {
-				throw new ContextError("Routine already declared: " + ident.getValue());
+				throw new ContextError("Routine already declared: " + ident.getValue(), ident.getLine());
 			}
 
 			param.check(procedure);
@@ -330,7 +331,7 @@ public interface AbsTree {
 		@Override
 		public int check(final int locals) throws ContextError {
 			if (locals >= 0) {
-				throw new ContextError("Function declarations are only allowed globally!");
+				throw new ContextError("Function declarations are only allowed globally!", ident.getLine());
 			}
 			Routine routine = Compiler.getRoutineTable().getRoutine(ident.getValue());
 			Compiler.setScope(routine.getScope());
@@ -390,7 +391,8 @@ public interface AbsTree {
 		}
 
 		public Store getStore() {
-			return new Store(typedIdent.getIdent().getValue(), typedIdent, changeMode.getValue() == ModeAttributes.CONST);
+			return new Store(typedIdent.getIdent().getValue(), typedIdent,
+					changeMode.getValue() == ModeAttributes.CONST);
 		}
 
 		@Override
@@ -409,7 +411,8 @@ public interface AbsTree {
 		public void checkDeclaration() throws ContextError {
 			if (this.getTypedIdent() instanceof TypedIdentIdent) {
 				if (Compiler.getGlobalStoreTable().containsIdent(typedIdent.getIdent().getValue())) {
-					throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue());
+					throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue(),
+							typedIdent.getIdent().getLine());
 				}
 
 				Compiler.getGlobalStoreTable().addStore(typedIdent.getIdent().getValue(), getStore());
@@ -417,16 +420,17 @@ public interface AbsTree {
 			} else {
 				Store store = getStore();
 				if (!Compiler.getGlobalStoreTable().addStore(store.getIdent(), store)) {
-					throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue());
+					throw new ContextError("Store already declared: " + typedIdent.getIdent().getValue(),
+							typedIdent.getIdent().getLine());
 				}
 			}
-			
+
 			if (this.getTypedIdent() instanceof TypedIdentArr) {
 				int start = Integer.parseInt(((TypedIdentArr) typedIdent).cmdAssi.getStart());
 				int end = Integer.parseInt(((TypedIdentArr) typedIdent).cmdAssi.getEnd());
 				Compiler.addArrayStoreTable(typedIdent.getIdent().getValue(), new Range(start, end));
 			}
-			
+
 			if (nextDeclaration != null)
 				nextDeclaration.checkDeclaration();
 		}
@@ -451,11 +455,11 @@ public interface AbsTree {
 			Ident ident = typedIdent.getIdent();
 			if (t instanceof TypedIdentIdent) {
 				if (!Compiler.getScope().getStoreTable().addStore(ident.getValue(), store)) {
-					throw new ContextError("Ident already declared: " + ident.getValue());
+					throw new ContextError("Ident already declared: " + ident.getValue(), ident.getLine());
 				}
 			} else {
 				if (!Compiler.getScope().getStoreTable().addStore(ident.getValue(), store)) {
-					throw new ContextError("Ident already declared: " + ident.getValue());
+					throw new ContextError("Ident already declared: " + ident.getValue(), ident.getLine());
 				}
 			}
 
@@ -504,6 +508,10 @@ public interface AbsTree {
 
 		public TypedIdent getTypedIdent() {
 			return declarationStorage.getTypedIdent();
+		}
+
+		public int getLine() {
+			return declarationStorage.getTypedIdent().getIdent().getLine();
 		}
 
 		public void check(final Routine routine) throws ContextError {
@@ -662,11 +670,11 @@ public interface AbsTree {
 		public Expression getTargetExpression() {
 			return targetExpression;
 		}
-		
+
 		public String getStart() {
 			return targetExpression.getValue();
 		}
-		
+
 		public String getEnd() {
 			return sourceExpression.getValue();
 		}
@@ -687,7 +695,7 @@ public interface AbsTree {
 
 		@Override
 		public void check(final boolean canInit) throws ContextError {
-			
+
 			Type typeL;
 			Object tmp = targetExpression.checkL(canInit);
 			if (tmp instanceof TypedIdentArr) {
@@ -800,7 +808,7 @@ public interface AbsTree {
 			}
 
 			if (type.getValue() != TypeAttribute.BOOL) {
-				throw new ContextError("IF condition must be a boolean! ");
+				throw new ContextError("IF condition must be a boolean!", expression.getLine());
 			}
 
 			Scope parentScope = Compiler.getScope();
@@ -819,7 +827,7 @@ public interface AbsTree {
 					Store storeElse = (Store) elseScope.getStoreTable().getStore(store.getIdent());
 					if (storeIf.isInitialized() != storeElse.isInitialized()) {
 						throw new ContextError("Initialization must happen in both branches of an IF command! Ident: "
-								+ store.getIdent());
+								+ store.getIdent(), expression.getLine());
 					}
 
 					if (storeIf.isInitialized()) {
@@ -893,7 +901,7 @@ public interface AbsTree {
 				type = (Type) tmp;
 			}
 			if (type.getValue() != TypeAttribute.BOOL) {
-				throw new ContextError("WHILE condition must be a boolean! ");
+				throw new ContextError("WHILE condition must be a boolean!", expression.getLine());
 			}
 			cmd.check(true);
 			if (nextCmd != null)
@@ -943,13 +951,18 @@ public interface AbsTree {
 			return nextCmd;
 		}
 
+		public int getLine() {
+			return routineCall.getIdent().getLine();
+		}
+
 		public void check(boolean canInit) throws ContextError {
 			Ident ident = routineCall.getIdent();
 			RoutineTypes type = Compiler.getRoutineTable().getType(ident.getValue());
 			if (type == null) {
-				throw new ContextError("Ident " + ident.getValue() + " not declared");
+				throw new ContextError("Ident " + ident.getValue() + " not declared", ident.getLine());
 			} else if (type != RoutineTypes.PROCEDURE) {
-				throw new ContextError("Function call " + ident.getValue() + " found in left part of an assignement");
+				throw new ContextError("Function call " + ident.getValue() + " found in left part of an assignement",
+						ident.getLine());
 			}
 
 			Routine routine = Compiler.getRoutineTable().getRoutine(ident.getValue());
@@ -972,22 +985,18 @@ public interface AbsTree {
 				}
 
 				if (aliasList.contains(globImp.getIdent())) {
-					throw new ContextError(
-							"Global import is already used as a parameter! Ident: " + globImp.getIdent());
+					throw new ContextError("Global import is already used as a parameter! Ident: " + globImp.getIdent(),
+							ident.getLine());
 				}
 			}
 
 			if (globInits != null && globInits.size() > 0) {
-				throw new ContextError("Global init is not importet! Ident: " + globInits.iterator().next());
+				throw new ContextError("Global init is not importet! Ident: " + globInits.iterator().next(),
+						ident.getLine());
 			}
 
 			if (nextCmd != null)
 				nextCmd.check(canInit);
-		}
-
-		@Override
-		public int getLine() {
-			return 0;
 		}
 
 		// @Override
@@ -1043,10 +1052,11 @@ public interface AbsTree {
 				type = (Type) tmp;
 			}
 
-			if (!(expr instanceof ExprArray) && !(expr instanceof ExprStore) && !((expr instanceof ExprDyadic)
-					&& ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT
-					&& (((ExprDyadic) expr).getExpr2() instanceof ExprStore))) {
-				throw new ContextError("Input needs to be assigned to a store!");
+			if (!(expr instanceof ExprArray) && !(expr instanceof ExprStore)
+					&& !((expr instanceof ExprDyadic)
+							&& ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT
+							&& (((ExprDyadic) expr).getExpr2() instanceof ExprStore))) {
+				throw new ContextError("Input needs to be assigned to a store!", expr.getLine());
 			}
 			if (nextCmd != null)
 				nextCmd.check(canInit);
@@ -1122,7 +1132,7 @@ public interface AbsTree {
 			if (!(expr instanceof ExprStore) && !((expr instanceof ExprDyadic)
 					&& ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT
 					&& (((ExprDyadic) expr).getExpr2() instanceof ExprStore))) {
-				throw new ContextError("Output needs to be a store!");
+				throw new ContextError("Output needs to be a store!", expr.getLine());
 			}
 
 			if (nextCmd != null)
@@ -1171,12 +1181,12 @@ public interface AbsTree {
 	public class TypedIdentArr extends TypedIdent {
 		private final TypedIdent ti;
 		private final CmdAssi cmdAssi;
-		//private final RangeVal rangeval;
+		// private final RangeVal rangeval;
 
 		public TypedIdentArr(TypedIdent ti, CmdAssi cmdAssi) {
 			this.ti = ti;
 			this.cmdAssi = cmdAssi;
-			//this.rangeval = rangeval;
+			// this.rangeval = rangeval;
 		}
 
 		@Override
@@ -1194,7 +1204,6 @@ public interface AbsTree {
 		public Object getType() {
 			return ti.getType();
 		}
-
 	}
 
 	public class TypedIdentIdent extends TypedIdent<Ident> {
@@ -1250,7 +1259,7 @@ public interface AbsTree {
 		abstract T checkR() throws ContextError;
 
 		abstract T checkL(boolean canInit) throws ContextError;
-		
+
 		abstract String getValue();
 
 		// abstract int code(int loc);
@@ -1267,11 +1276,11 @@ public interface AbsTree {
 			this.ident = ident;
 			this.expression = expression2;
 		}
-		
+
 		public Ident getIdent() {
 			return ident;
 		}
-		
+
 		public String getValue() {
 			return ident.getValue();
 		}
@@ -1281,18 +1290,19 @@ public interface AbsTree {
 			return indent + "<ExprArray>\n" + expression.toString(indent + '\t') + indent + "\t<ArrayName>\n"
 					+ ident.toString(indent + '\t' + '\t') + indent + "\t</ArrayName>\n" + indent + "</ExprArray>\n";
 		}
-		
+
 		@Override
 		public TypedIdentType checkR() throws ContextError {
 			TypedIdent type = Compiler.getScope().getType(ident.getValue());
 
 			if (type == null) {
-				throw new ContextError("Array " + ident.getValue() + " not declared");
+				throw new ContextError("Array " + ident.getValue() + " not declared", ident.getLine());
 			}
 
 			if (isInit && !(type instanceof TypedIdentArr)) {
 				throw new ContextError(
-						"Initialization of " + ident.getValue() + " found in right part of an assignement");
+						"Initialization of " + ident.getValue() + " found in right part of an assignement",
+						ident.getLine());
 			}
 
 			// if (!((Store)
@@ -1301,13 +1311,14 @@ public interface AbsTree {
 			// throw new ContextError("Store " + ident.getValue() + " is not
 			// initialized");
 			// }
-			
+
 			if (type instanceof TypedIdentArr) {
 				Range range = (Range) Compiler.getArrayStoreTable().getStore(ident.getValue());
 				int value = Integer.parseInt(expression.getValue());
-				
+
 				if (range.getStart() > value || value > range.getEnd()) {
-					throw new ContextError("Index out of bound exception for array " + ident.getValue());
+					throw new ContextError("Index " + value + " out of bound: [" + range.getStart() + ":"
+							+ range.getEnd() + "]" + ident.getValue(), ident.getLine());
 				}
 			}
 
@@ -1320,7 +1331,7 @@ public interface AbsTree {
 			TypedIdent type = Compiler.getScope().getType(ident.getValue());
 
 			if (type == null) {
-				throw new ContextError("Array " + ident.getValue() + " not declared");
+				throw new ContextError("Array " + ident.getValue() + " not declared", ident.getLine());
 			}
 
 			Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
@@ -1328,27 +1339,28 @@ public interface AbsTree {
 			if (isInit) {
 
 				if (canInit) {
-					throw new ContextError("Store can not be initialized here " + "(loop)!");
+					throw new ContextError("Store can not be initialized here " + "(loop)!", ident.getLine());
 				}
 
 				if (store.isInitialized()) {
-					throw new ContextError("Store " + ident.getValue() + " is already initialized");
+					throw new ContextError("Store " + ident.getValue() + " is already initialized", ident.getLine());
 				}
 
 				store.initialize();
 
 			} else if (!store.isInitialized()) {
-				throw new ContextError("Store " + ident.getValue() + " is not initialized");
+				throw new ContextError("Store " + ident.getValue() + " is not initialized", ident.getLine());
 			} else if (!store.isWriteable()) {
-				throw new ContextError("Store " + ident.getValue() + " is not writeable");
+				throw new ContextError("Store " + ident.getValue() + " is not writeable", ident.getLine());
 			}
-			
+
 			if (type instanceof TypedIdentArr) {
 				Range range = (Range) Compiler.getArrayStoreTable().getStore(ident.getValue());
 				int value = Integer.parseInt(expression.getValue());
-				
+
 				if (range.getStart() > value || value > range.getEnd()) {
-					throw new ContextError("Index out of bound exception for array " + ident.getValue());
+					throw new ContextError("Index " + value + " out of bound: [" + range.getStart() + ":"
+							+ range.getEnd() + "]" + ident.getValue(), ident.getLine());
 				}
 			}
 
@@ -1357,8 +1369,7 @@ public interface AbsTree {
 
 		@Override
 		public int getLine() {
-			// TODO Auto-generated method stub
-			return 0;
+			return ident.getLine();
 		}
 
 		// @Override
@@ -1391,12 +1402,13 @@ public interface AbsTree {
 
 		@Override
 		public Type checkL(final boolean canInit) throws ContextError {
-			throw new ContextError("Found literal " + literal.getLiteral() + "in the left part of an assignement");
+			throw new ContextError("Found literal " + literal.getLiteral() + "in the left part of an assignement",
+					literal.getLine());
 		}
 
 		@Override
-		int getLine() {
-			return 0;
+		public int getLine() {
+			return literal.getLine();
 		}
 
 		@Override
@@ -1446,16 +1458,18 @@ public interface AbsTree {
 			TypedIdent type = Compiler.getScope().getType(ident.getValue());
 
 			if (type == null) {
-				throw new ContextError("Ident " + ident.getValue() + " not declared");
+				throw new ContextError("Ident " + ident.getValue() + " not declared", ident.getLine());
 			}
 
 			if (type instanceof TypedIdentIdent) {
-				throw new ContextError("Records cannot be used here. " + " Record " + ident.getValue());
+				throw new ContextError("Records cannot be used here. " + " Record " + ident.getValue(),
+						ident.getLine());
 			}
 
 			if (isInit) {
 				throw new ContextError(
-						"Initialization of " + ident.getValue() + " found in right part of an assignement");
+						"Initialization of " + ident.getValue() + " found in right part of an assignement",
+						ident.getLine());
 			}
 
 			// if (!((Store)
@@ -1464,9 +1478,9 @@ public interface AbsTree {
 			// throw new ContextError("Store " + ident.getValue() + " is not
 			// initialized");
 			// }
-			
+
 			if (type instanceof TypedIdentArr) {
-				throw new ContextError("Arrays cannot be passed in procs yet!");
+				throw new ContextError("Arrays cannot be passed in procs yet!", ident.getLine());
 			}
 
 			return (TypedIdentType) type;
@@ -1478,7 +1492,7 @@ public interface AbsTree {
 			TypedIdent type = Compiler.getScope().getType(ident.getValue());
 
 			if (type == null) {
-				throw new ContextError("Ident " + ident.getValue() + " not declared");
+				throw new ContextError("Ident " + ident.getValue() + " not declared", ident.getLine());
 			}
 
 			Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
@@ -1486,28 +1500,27 @@ public interface AbsTree {
 			if (isInit) {
 
 				if (canInit) {
-					throw new ContextError("Store can not be initialized here " + "(loop)!");
+					throw new ContextError("Store can not be initialized here " + "(loop)!", ident.getLine());
 				}
 
 				if (store.isInitialized()) {
-					throw new ContextError("Store " + ident.getValue() + " is already initialized");
+					throw new ContextError("Store " + ident.getValue() + " is already initialized", ident.getLine());
 				}
 
 				store.initialize();
 
 			} else if (!store.isInitialized()) {
-				throw new ContextError("Store " + ident.getValue() + " is not initialized");
+				throw new ContextError("Store " + ident.getValue() + " is not initialized", ident.getLine());
 			} else if (!store.isWriteable()) {
-				throw new ContextError("Store " + ident.getValue() + " is not writeable");
+				throw new ContextError("Store " + ident.getValue() + " is not writeable", ident.getLine());
 			}
 
 			return type;
 		}
 
 		@Override
-		int getLine() {
-			// TODO Auto-generated method stub
-			return 0;
+		public int getLine() {
+			return ident.getLine();
 		}
 
 		@Override
@@ -1715,7 +1728,7 @@ public interface AbsTree {
 					if (type1.getValue() == TypeAttribute.INT64 && type2.getValue() == TypeAttribute.INT64) {
 						return new Type(TypeAttribute.INT64);
 					} else {
-						throw new ContextError("Type error in Operator " + operator.getValue());
+						throw new ContextError("Type error in Operator " + operator.getValue(), operator.getLine());
 					}
 				case EQ:
 				case NE:
@@ -1729,14 +1742,14 @@ public interface AbsTree {
 					if (type1.getValue() == TypeAttribute.INT64 && type2.getValue() == TypeAttribute.INT64) {
 						return new Type(TypeAttribute.BOOL);
 					} else {
-						throw new ContextError("Type error in Operator " + operator.getValue());
+						throw new ContextError("Type error in Operator " + operator.getValue(), operator.getLine());
 					}
 				case CAND:
 				case COR:
 					if (type1.getValue() == TypeAttribute.BOOL && type2.getValue() == TypeAttribute.BOOL) {
 						return new Type(TypeAttribute.BOOL);
 					} else {
-						throw new ContextError("Type error in Operator " + operator.getValue());
+						throw new ContextError("Type error in Operator " + operator.getValue(), operator.getLine());
 					}
 				default:
 					throw new RuntimeException();
@@ -1754,7 +1767,8 @@ public interface AbsTree {
 			case DOT:
 				TypedIdent type = (TypedIdent) expr2.checkL(canInit);
 				if (!Compiler.getGlobalStoreTable().containsIdent(type.getIdent().getValue())) {
-					throw new ContextError("Ident " + type.getIdent().getValue() + "not declared");
+					throw new ContextError("Ident " + type.getIdent().getValue() + "not declared",
+							type.getIdent().getLine());
 				}
 				Store store = (Store) Compiler.getGlobalStoreTable()
 						.getStore(type.getIdent().getValue() + "." + ((ExprStore) expr1).getIdent().getValue());
@@ -1762,7 +1776,8 @@ public interface AbsTree {
 				expr1.checkL(canInit);
 				return ((TypedIdentType) store.getType()).getType();
 			default:
-				throw new ContextError("Found operator " + operator.getValue() + "in the left part of an assignement");
+				throw new ContextError("Found operator " + operator.getValue() + "in the left part of an assignement",
+						operator.getLine());
 			}
 		}
 
@@ -1837,9 +1852,8 @@ public interface AbsTree {
 		}
 
 		@Override
-		int getLine() {
-			// TODO Auto-generated method stub
-			return 0;
+		public int getLine() {
+			return operator.getLine();
 		}
 
 		@Override
@@ -1902,7 +1916,7 @@ public interface AbsTree {
 		public void check(final List<ch.fhnw.cpib.compiler.context.Parameter> paramList, final Set<String> aliasList,
 				final boolean canInit) throws ContextError {
 			if (paramList.size() <= 0) {
-				throw new ContextError("Routione takes less parameters than provided. ");
+				throw new ContextError("Routine takes less parameters than provided.", expression.getLine());
 			}
 			param = paramList.get(0);
 			paramList.remove(0);
@@ -1924,16 +1938,16 @@ public interface AbsTree {
 				else
 					type = (Type) tmp;
 				if (!(expression instanceof ExprStore)) {
-					throw new ContextError("Only stores can be used as IN REF parameter!");
+					throw new ContextError("Only stores can be used as IN REF parameter!", expression.getLine());
 				}
 				if (aliasList.contains(((ExprStore) expression).getStore().getIdent())) {
-					throw new ContextError("Store is already used a parameter!");
+					throw new ContextError("Store is already used a parameter!", expression.getLine());
 				}
 				aliasList.add(((ExprStore) expression).getStore().getIdent());
 			}
 
 			if (type.getValue() != ((TypedIdentType) param.getType()).getType().getValue()) {
-				throw new ContextError("Wrong paramter type!");
+				throw new ContextError("Wrong paramter type!", expression.getLine());
 			}
 
 			if (expressionList != null)
@@ -1968,7 +1982,7 @@ public interface AbsTree {
 		}
 
 		public int getLine() {
-			return 0;
+			return ident.getLine();
 		}
 
 		public Ident getIdent() {
@@ -1981,7 +1995,8 @@ public interface AbsTree {
 
 		public Set<String> check(final Set<String> initList) throws ContextError {
 			if (initList.contains(ident.getValue())) {
-				throw new ContextError("Global init already declared!" + " Ident: " + ident.getValue());
+				throw new ContextError("Global init already declared!" + " Ident: " + ident.getValue(),
+						ident.getLine());
 			} else {
 				initList.add(ident.getValue());
 			}
@@ -2018,18 +2033,19 @@ public interface AbsTree {
 		}
 
 		public int getLine() {
-			return 0;
+			return ident.getLine();
 		}
 
 		public void check(final Routine routine) throws ContextError {
 			Store globalStore = (Store) Compiler.getGlobalStoreTable().getStore(ident.getValue());
 
 			if (globalStore == null) {
-				throw new ContextError("Global import is not declared! Ident: " + ident.getValue());
+				throw new ContextError("Global import is not declared! Ident: " + ident.getValue(), ident.getLine());
 			}
 
 			if (globalStore.isConst() && changeMode.getValue() != ModeAttributes.CONST) {
-				throw new ContextError("Cannot import global constant as variable! Ident: " + ident.getValue());
+				throw new ContextError("Cannot import global constant as variable! Ident: " + ident.getValue(),
+						ident.getLine());
 			}
 
 			Store localStore = new Store(globalStore.getIdent(), globalStore.getType(),
@@ -2039,9 +2055,9 @@ public interface AbsTree {
 			localStore.setRelative(false);
 
 			if (!Compiler.getScope().getStoreTable().addStore(localStore.getType().getIdent().getValue(), localStore)) {
-				throw new ContextError("Global ident already used! Ident: " + ident.getValue());
+				throw new ContextError("Global ident already used! Ident: " + ident.getValue(), ident.getLine());
 			}
-			
+
 			localStore.initialize();
 
 			routine.addGlobImp(new GlobImp(getChangeMode(), ident.getValue()));
@@ -2050,7 +2066,8 @@ public interface AbsTree {
 
 		public void checkInit() throws ContextError {
 			if (!((Store) Compiler.getScope().getStoreTable().getStore(ident.getValue())).isInitialized()) {
-				throw new ContextError("global import is never initialized! Ident: " + ident.getValue());
+				throw new ContextError("global import is never initialized! Ident: " + ident.getValue(),
+						ident.getLine());
 			}
 			nextGlobalImport.checkInit();
 		}

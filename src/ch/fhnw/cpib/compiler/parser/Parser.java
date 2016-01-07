@@ -33,7 +33,7 @@ public class Parser {
             }
             return consumedToken;
         } else {
-            throw new GrammarError("terminal expected: " + expectedTerminal + ", terminal found: " + terminal);
+            throw new GrammarError("terminal expected: " + expectedTerminal + ", terminal found: " + terminal, token.getLine());
         }
     }
 
@@ -104,7 +104,7 @@ public class Parser {
             //System.out.println("declaration ::= storageDeclaration");
             return storageDeclaration();
         default:
-            throw new GrammarError("declaration got " + terminal);
+            throw new GrammarError("declaration got " + terminal, token.getLine());
         }
     }
 
@@ -266,7 +266,7 @@ public class Parser {
             Type type = (Type) consume(Terminals.TYPE);
             return new TypeDeclarationType(type);
         } else {
-            throw new GrammarError("terminal expected: IDENT | TYPE, terminal found: " + terminal);
+            throw new GrammarError("terminal expected: IDENT | TYPE, terminal found: " + terminal, token.getLine());
         }
     }
 
@@ -356,7 +356,7 @@ public class Parser {
             ret = new ConcTree.CmdExpression(expression2, nextExpression2);
             break;
         default:
-            throw new GrammarError("terminal expected: SKIP | IF | CALL | WHILE | DEBUGIN | DEBUGOUT | IDENT, terminal found: " + terminal + " in a command");
+            throw new GrammarError("terminal expected: SKIP | IF | CALL | WHILE | DEBUGIN | DEBUGOUT | IDENT, terminal found: " + terminal + " in a command", token.getLine());
         }
         return ret;
     }
@@ -616,7 +616,7 @@ public class Parser {
             ret = new ConcTree.MonadicOperator((Operator) consume(Terminals.ADDOPR));
             break;
         default:
-            throw new GrammarError("terminal expected: NOT | ADDOPR, terminal found: " + terminal);
+            throw new GrammarError("terminal expected: NOT | ADDOPR, terminal found: " + terminal, token.getLine());
         }
         return ret;
     }

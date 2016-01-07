@@ -79,6 +79,7 @@ public class Scanner {
                 currentState = State.INITIALSTATE;
             } else if ('\u0003' == c) {
                 IToken token = new Keywords.Sentinel();
+                token.setLine(lineNumber);
                 tokenList.add(token);
             } else {
                 throw new LexicalError("unknown char", c, lineNumber, charNumber);
@@ -90,12 +91,14 @@ public class Scanner {
                 tmpHolder += c;
             } else if ((' ' == c) || ('\t' == c) || ('\n' == c) || ('\r' == c)) {
                 IToken token = new Literal(Integer.parseInt(tmpHolder));
+                token.setLine(lineNumber);
                 tokenList.add(token);
                 tmpHolder = "";
                 currentState = State.INITIALSTATE;
             } else if (ScannerSymbols.contains((int) c) || '\u0003' == c || ('A' <= c && c <= 'Z')
                     || ('a' <= c && c <= 'z')) {
                 IToken token = new Literal(Integer.parseInt(tmpHolder));
+                token.setLine(lineNumber);
                 tokenList.add(token);
                 tmpHolder = "";
                 currentState = State.INITIALSTATE;
@@ -111,11 +114,13 @@ public class Scanner {
                 tmpHolder += c;
             } else if ((' ' == c) || ('\t' == c) || ('\n' == c) || ('\r' == c)) {
                 IToken token = scanKeyword(tmpHolder);
+                token.setLine(lineNumber);
                 tokenList.add(token);
                 tmpHolder = "";
                 currentState = State.INITIALSTATE;
             } else if (ScannerSymbols.contains((int) c) || '\u0003' == c) {
                 IToken token = scanKeyword(tmpHolder);
+                token.setLine(lineNumber);
                 tokenList.add(token);
                 tmpHolder = "";
                 currentState = State.INITIALSTATE;
@@ -165,11 +170,13 @@ public class Scanner {
                     || symbols.charAt(0) == '|' || symbols.charAt(0) == ':') {
                 token = findSymbol(symbols);
                 if (token != null) {
+                	token.setLine(lineNumber);
                     tokenList.add(token);
                 } else {
                     for (char ch : symbols.toCharArray()) {
                         token = findSymbol("" + ch);
                         if (token != null) {
+                        	token.setLine(lineNumber);
                             tokenList.add(findSymbol("" + ch));
                         } else {
                             throw new LexicalError("unknown char", c, lineNumber, charNumber);
@@ -180,6 +187,7 @@ public class Scanner {
                 for (char ch : symbols.toCharArray()) {
                     token = findSymbol("" + ch);
                     if (token != null) {
+                    	token.setLine(lineNumber);
                         tokenList.add(findSymbol("" + ch));
                     } else {
                         throw new LexicalError("unknown char", c, lineNumber, charNumber);
@@ -191,6 +199,7 @@ public class Scanner {
         } else if (symbols.length() == 1) {
             IToken token = findSymbol(symbols);
             if (token != null) {
+            	token.setLine(lineNumber);
                 tokenList.add(token);
             } else {
                 throw new LexicalError("unknown char", c, lineNumber, charNumber);
