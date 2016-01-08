@@ -106,13 +106,12 @@ public final class Compiler {
         System.out.println(" > Checker:\n");
         absTree.check();
         
-        System.out.println("No error found!");
+        System.out.println("No error found! \n");
         
         System.out.println(" > Generating Code:\n");
         absTree.code(0);
         codeArray.resize();
         vm = new VirtualMachine(codeArray, STORE_SIZE);
-        
     }
 
     public static void main(String[] args) {

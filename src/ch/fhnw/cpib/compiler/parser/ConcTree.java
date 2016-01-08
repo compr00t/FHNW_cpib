@@ -336,8 +336,8 @@ public interface ConcTree {
                     + "</RangeVal>\n";
         }
         
-        public AbsTree.CmdAssi toAbstract() {
-            return new AbsTree.CmdAssi(expression.toAbstract(), nextExpression.toAbstract(), null);
+        public AbsTree.RangeVal toAbstract() {
+            return new AbsTree.RangeVal(expression.toAbstract(), nextExpression.toAbstract(), null);
         }
     }
 

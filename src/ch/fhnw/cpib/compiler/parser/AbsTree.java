@@ -426,8 +426,8 @@ public interface AbsTree {
 			}
 
 			if (this.getTypedIdent() instanceof TypedIdentArr) {
-				int start = Integer.parseInt(((TypedIdentArr) typedIdent).cmdAssi.getStart());
-				int end = Integer.parseInt(((TypedIdentArr) typedIdent).cmdAssi.getEnd());
+				int start = Integer.parseInt(((TypedIdentArr) typedIdent).rangeVal.getStart());
+				int end = Integer.parseInt(((TypedIdentArr) typedIdent).rangeVal.getEnd());
 				Compiler.addArrayStoreTable(typedIdent.getIdent().getValue(), new Range(start, end));
 			}
 
@@ -647,6 +647,21 @@ public interface AbsTree {
          public int code(int loc) throws CodeTooSmallError {
              return (nextCmd != null ? nextCmd.code(loc) : loc);
          }
+	}
+	
+	public class RangeVal extends CmdAssi {
+		
+		public RangeVal(Expression targetExpression, Expression sourceExpression, Cmd nextCmd) {
+			super(targetExpression, sourceExpression, nextCmd);
+		}
+
+		@Override
+		public String toString(final String indent) {
+			return indent + "<RangeVal>\n" + super.getTargetExpression().toString(indent + '\t')
+					+ super.getSourceExpression().toString(indent + '\t')
+					+ (super.getNextCmd() != null ? super.getNextCmd().toString(indent + '\t') : indent + "\t<noNextElement/>\n") + indent
+					+ "</RangeVal>\n";
+		}
 	}
 
 	public class CmdAssi extends Cmd {
@@ -1177,18 +1192,16 @@ public interface AbsTree {
 
 	public class TypedIdentArr extends TypedIdent {
 		private final TypedIdent ti;
-		private final CmdAssi cmdAssi;
-		// private final RangeVal rangeval;
+		private final RangeVal rangeVal;
 
-		public TypedIdentArr(TypedIdent ti, CmdAssi cmdAssi) {
+		public TypedIdentArr(TypedIdent ti, RangeVal rangeVal) {
 			this.ti = ti;
-			this.cmdAssi = cmdAssi;
-			// this.rangeval = rangeval;
+			this.rangeVal = rangeVal;
 		}
 
 		@Override
 		public String toString(String indent) {
-			return indent + "<TypedArr>\n" + ti.toString(indent + '\t') + cmdAssi.toString(indent + '\t') + indent
+			return indent + "<TypedArr>\n" + ti.toString(indent + '\t') + rangeVal.toString(indent + '\t') + indent
 					+ "</TypedArr>\n";
 		}
 
@@ -1339,9 +1352,9 @@ public interface AbsTree {
 					throw new ContextError("Store can not be initialized here " + "(loop)!", ident.getLine());
 				}
 
-				if (store.isInitialized()) {
-					throw new ContextError("Store " + ident.getValue() + " is already initialized", ident.getLine());
-				}
+				//if (store.isInitialized()) {
+				//	throw new ContextError("Store " + ident.getValue() + " is already initialized", ident.getLine());
+				//}
 
 				store.initialize();
 

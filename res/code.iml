@@ -42,6 +42,8 @@ do
 	
 	n := 4 - m + 3 + [4]x;
 	[-2]x := m + 2 * 3;
+	[-1]x := [-2]x;
+	[0]x := [-1]x + 2 + [-2]x;
 	
 	// Ident y not declared
 	// call divide(m, [5]y, q init, r init);
