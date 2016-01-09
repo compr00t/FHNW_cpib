@@ -1,0 +1,15 @@
+program intDiv()
+global
+
+	var n:int64;
+	var m:int64;
+	var [-3:15]x:int64
+
+do
+	n init := 0;
+	[5 + 1]x := 4;
+	m init := 1
+	
+	
+	
+endprogram

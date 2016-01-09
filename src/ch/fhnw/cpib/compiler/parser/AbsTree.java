@@ -11,6 +11,7 @@ import java.util.Set;
 
 
 
+
 //import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
 import ch.fhnw.cpib.compiler.scanner.enums.ModeAttributes;
 import ch.fhnw.cpib.compiler.scanner.enums.OperatorAttribute;
@@ -808,9 +809,9 @@ public interface AbsTree {
             if(targetExpression instanceof ExprArray){
                 Compiler.getcodeArray().put(loc,new LoadAddrRel(getArrayAdress(((ExprArray) targetExpression).ident.getValue())));
                 loc1=loc+1;
-                ((ExprArray) targetExpression).expression.code(loc1);
+                loc1=((ExprArray) targetExpression).expression.code(loc1);
                 //Compiler.getcodeArray().put(loc+1,new LoadImInt(new Integer(((ExprArray)targetExpression).expression.getValue()).intValue()));
-                Compiler.getcodeArray().put(++loc1, new LoadImInt(getArrayOffset(((ExprArray) targetExpression).ident.getValue())));
+                Compiler.getcodeArray().put(loc1, new LoadImInt(getArrayOffset(((ExprArray) targetExpression).ident.getValue())));
                 Compiler.getcodeArray().put(++loc1, new SubInt());
                 Compiler.getcodeArray().put(++loc1, new AddInt());
                 loc1++;
@@ -889,7 +890,7 @@ public interface AbsTree {
 			if (type.getValue() != TypeAttribute.BOOL) {
 				throw new ContextError("IF condition must be a boolean!", expression.getLine());
 			}
-//
+
 			Scope parentScope = Compiler.getScope();
 			Scope ifScope = new Scope(parentScope.getStoreTable().clone());
 			Scope elseScope = new Scope(parentScope.getStoreTable().clone());
@@ -1973,7 +1974,40 @@ public interface AbsTree {
 		@Override
 		String getValue() {
 			// TODO Auto-generated method stub
-			return null;
+		    boolean expr1Variable = Compiler.getIdentTable().containsKey((expr1.getValue()));
+		    boolean expr2Variable = Compiler.getIdentTable().containsKey((expr2.getValue()));
+		    int a = 0;
+		    int b = 0;
+		            
+		    if(expr1Variable == true && expr2Variable == true){
+		        a = Compiler.getIdentTable().get(expr1.getValue()).intValue();
+		        b = Compiler.getIdentTable().get(expr2.getValue()).intValue();
+		    }else if(expr1Variable == true){
+                a = Compiler.getIdentTable().get(expr1.getValue()).intValue();
+                b = Integer.parseInt(expr2.getValue());
+            }else if(expr2Variable == true){
+                a = Integer.parseInt(expr1.getValue());
+                b = Compiler.getIdentTable().get(expr2.getValue()).intValue();
+		    }else{
+		        a = Integer.parseInt(expr1.getValue());
+		        b = Integer.parseInt(expr2.getValue());
+		    }
+		    
+		    
+		    switch (operator.getValue()) {
+            case PLUS:
+                return (a + b) + "";
+            case MINUS:
+                return (a - b) + "";
+            case TIMES:
+                return (a * b) + "";
+            case DIV:
+                return (a / b) + "";
+            case MOD:
+                return (a % b) + "";
+            default:
+                throw new IllegalArgumentException("Illegal operator for get value");
+		    }
 		}
 	}
 
