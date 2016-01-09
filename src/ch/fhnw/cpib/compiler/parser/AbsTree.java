@@ -889,7 +889,7 @@ public interface AbsTree {
 			if (type.getValue() != TypeAttribute.BOOL) {
 				throw new ContextError("IF condition must be a boolean!", expression.getLine());
 			}
-
+//
 			Scope parentScope = Compiler.getScope();
 			Scope ifScope = new Scope(parentScope.getStoreTable().clone());
 			Scope elseScope = new Scope(parentScope.getStoreTable().clone());
