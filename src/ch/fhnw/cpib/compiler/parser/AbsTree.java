@@ -1570,7 +1570,7 @@ public interface AbsTree {
 			// }
 
 			if (type instanceof TypedIdentArr) {
-				throw new ContextError("Arrays cannot be passed in procs yet!", ident.getLine());
+			    throw new ContextError("Arrays cannot be addressed without index yet!", ident.getLine());
 			}
 
 			return (TypedIdentType) type;
