@@ -1,9 +1,15 @@
 package ch.fhnw.cpib.compiler.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+
+
+
+
 
 //import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
 import ch.fhnw.cpib.compiler.scanner.enums.ModeAttributes;
@@ -27,6 +33,7 @@ import ch.fhnw.lederer.virtualmachineFS2015.CodeArray;
 import ch.fhnw.lederer.virtualmachineFS2015.ICodeArray;
 import ch.fhnw.lederer.virtualmachineFS2015.ICodeArray.CodeTooSmallError;
 import ch.fhnw.lederer.virtualmachineFS2015.IInstructions;
+import ch.fhnw.lederer.virtualmachineFS2015.IInstructions.IInstr;
 import ch.fhnw.lederer.virtualmachineFS2015.IInstructions.*;
 
 public interface AbsTree {
@@ -65,7 +72,7 @@ public interface AbsTree {
 		}
 
 		public Ident getIdent() {
-			return ident;
+		    return ident;
 		}
 
 		public ProgramParameter getProgramParameter() {
@@ -87,17 +94,26 @@ public interface AbsTree {
 			cmd.check(false);
 		}
 
-		public int code(final int loc) throws CodeTooSmallError {
+		public void code(final int loc) throws CodeTooSmallError {
 		    
-		     int loc1 = cmd.code(loc);
-             Compiler.getcodeArray().put(loc1, new Stop());;
-             if (declaration != null)
-             loc1 = declaration.code(loc1 + 1);
-             for (Routine routine :
-                 Compiler.getRoutineTable().getTable().values()) {
-                 routine.codeCalls();
-             }
-             return loc1;
+		    int loc1 = loc;
+		    
+		    if (declaration != null)
+                loc1 = declaration.code(loc1);
+		    for (Routine routine : Compiler.getRoutineTable().getTable().values()) {
+                routine.codeCalls();
+            }
+		    loc1 = cmd.code(loc1);
+            Compiler.getcodeArray().put(loc1, new Stop());
+            
+		    /*int loc1 = cmd.code(loc);
+            Compiler.getcodeArray().put(loc1, new Stop());
+            ;
+            if (declaration != null)
+                loc1 = declaration.code(loc1 + 1);
+            for (Routine routine : Compiler.getRoutineTable().getTable().values()) {
+                routine.codeCalls();
+            }*/
         }
 
 	}
@@ -466,10 +482,35 @@ public interface AbsTree {
 			return store;
 		}
 
-		public int code(final int loc) {
-			return loc;
-		}
-	}
+        public int code(final int loc) throws CodeTooSmallError {
+            int loc1 = loc;
+            Declaration d = this;
+            boolean nextDeclNull = false;
+            
+            while (!nextDeclNull) {
+                if(d.nextDecl==null){
+                    nextDeclNull = true;
+                }
+                if (((DeclarationStore)d).typedIdent instanceof TypedIdentArr) {
+                    Range range = (Range) Compiler.getArrayStoreTable().getStore(((DeclarationStore)d).typedIdent.getIdent().getValue());
+                    Compiler.getcodeArray().put(loc1, new AllocBlock(range.getSize()));
+                    ((Range) Compiler.getArrayStoreTable().getStore(((DeclarationStore)d).typedIdent.getIdent().getValue()))
+                            .setAddress(loc1);
+                    loc1++;
+
+                } else {
+                    Compiler.getcodeArray().put(loc1, new AllocBlock(1));
+                    Compiler.addIdentTable(((DeclarationStore)d).typedIdent.getIdent().getValue(), loc1);
+                    loc1++;
+                }
+                
+                d = d.getNextDecl();
+            }
+
+            return loc1;
+
+        }
+    }
 
 	public class Parameter {
 		private final MechMode mechMode;
@@ -739,9 +780,21 @@ public interface AbsTree {
 			if (nextCmd != null)
 				nextCmd.check(canInit);
 		}
+		
+		public int getArrayAdress(String s){
+		     return ((Range)Compiler.getArrayStoreTable().getStore(s)).getAddress();
+		    
+		}
+		
+		public int getArrayOffset(String s){
+            return ((Range)Compiler.getArrayStoreTable().getStore(s)).getOffset();
+           
+       }
 
         @Override
         public int code(final int loc) throws CodeTooSmallError {
+            int loc1;
+            
             if (sourceExpression instanceof ExprDyadic
                     && ((ExprDyadic) sourceExpression).getOperator().getValue() == OperatorAttribute.DOT) {
                 sourceExpression = (ExprStore) ((ExprDyadic) sourceExpression).getExpr1();
@@ -751,12 +804,25 @@ public interface AbsTree {
                     && ((ExprDyadic) targetExpression).getOperator().getValue() == OperatorAttribute.DOT) {
                 targetExpression = (ExprStore) ((ExprDyadic) targetExpression).getExpr1();
             }
-
-            int loc1 = sourceExpression.code(loc);
-            if (!(targetExpression instanceof ExprStore)) {
-                loc1 = targetExpression.code(loc1);
+            
+            if(targetExpression instanceof ExprArray){
+                Compiler.getcodeArray().put(loc,new LoadAddrRel(getArrayAdress(((ExprArray) targetExpression).ident.getValue())));
+                loc1=loc+1;
+                ((ExprArray) targetExpression).expression.code(loc1);
+                //Compiler.getcodeArray().put(loc+1,new LoadImInt(new Integer(((ExprArray)targetExpression).expression.getValue()).intValue()));
+                Compiler.getcodeArray().put(++loc1, new LoadImInt(getArrayOffset(((ExprArray) targetExpression).ident.getValue())));
+                Compiler.getcodeArray().put(++loc1, new SubInt());
+                Compiler.getcodeArray().put(++loc1, new AddInt());
+                loc1++;
+            }else{
+                loc1 = targetExpression.code(loc);
+            }
+            
+            if (!(sourceExpression instanceof ExprStore)) {
+                loc1 = sourceExpression.code(loc1);
+                Compiler.getcodeArray().put(loc1++, new IInstructions.Store());
             } else {
-                loc1 = ((ExprStore) targetExpression).codeRef(loc1);
+                loc1 = ((ExprStore) sourceExpression).codeRef(loc1);
                 //Compiler.getVM().Store(loc1++);
                 Compiler.getcodeArray().put(loc1++, new IInstructions.Store());
             }
@@ -1171,10 +1237,10 @@ public interface AbsTree {
 
             if (type.getValue() == TypeAttribute.BOOL) {
                 //Compiler.getVM().BoolOutput(loc1++, ((ExprStore) expr).getIdent().getValue());
-                Compiler.getcodeArray().put(loc1++, new InputBool(((ExprStore) expr).getIdent().getValue()));
+                Compiler.getcodeArray().put(loc1++, new OutputBool(((ExprStore) expr).getIdent().getValue()));
             } else {
                 //Compiler.getVM().IntOutput(loc1++, ((ExprStore) expr).getIdent().getValue());
-                Compiler.getcodeArray().put(loc1++, new InputInt(((ExprStore) expr).getIdent().getValue()));
+                Compiler.getcodeArray().put(loc1++, new OutputInt(((ExprStore) expr).getIdent().getValue()));
             }
             return (nextCmd != null ? nextCmd.code(loc1) : loc1);
         }
@@ -1383,9 +1449,22 @@ public interface AbsTree {
 		}
 
         @Override
-        int code(int loc) {
-            // TODO Auto-generated method stub
-            return 0;
+        public int code(int loc) throws CodeTooSmallError {
+           /* TypedIdent type = Compiler.getScope().getType(ident.getValue());
+            if (type instanceof TypedIdentArr) {
+                Range range = (Range) Compiler.getArrayStoreTable().getStore(ident.getValue());
+                Compiler.getcodeArray().put(loc + 1, new AllocBlock(range.getSize()));
+                ((Range) Compiler.getArrayStoreTable().getStore(ident.getValue())).setAddress(loc + 1);
+                return loc;
+
+            } else {
+                Compiler.getcodeArray().put(loc + 1, new LoadImInt(expression.code(loc)));
+                return loc + 1;
+            }*/
+            
+            Compiler.getcodeArray().put(loc+1, new LoadImInt(expression.code(loc)));
+            Compiler.getcodeArray().put(loc+2, new OutputInt(ident.getValue())); //code muss zuerst geholt werden
+            return loc + 3;
         }
 
 	}
@@ -1542,7 +1621,14 @@ public interface AbsTree {
         @Override
         public int code(final int loc) throws CodeTooSmallError {
             Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
-            return ((store != null) ? store.codeLoad(loc) : loc);
+            if(Compiler.getIdentTable().containsKey(ident.getValue())){
+                Compiler.getcodeArray().put(loc, new LoadAddrRel(Compiler.getIdentTable().get(ident.getValue()).intValue()));
+                return loc + 1;
+            }else{
+                Compiler.addIdentTable(ident.getValue(), loc);
+                return ((store != null) ? store.codeLoad(loc) : loc);
+            }
+            
         }
 
         public int codeRef(final int loc) throws CodeTooSmallError {
@@ -1578,6 +1664,9 @@ public interface AbsTree {
 
         @Override
         int code(int loc) {
+            //Zuerst AllocBlock für return value
+            //Parameter auf Stack legen in korrekter Form (LValue und RValue check)
+            //call ablegen mit addresse der func im codeArray
             return 0;
         }
 

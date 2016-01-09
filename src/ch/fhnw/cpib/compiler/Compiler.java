@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.HashMap;
 
 import ch.fhnw.cpib.compiler.context.RoutineTable;
 import ch.fhnw.cpib.compiler.context.Scope;
@@ -28,6 +29,7 @@ public final class Compiler {
     private static RoutineTable routineTable = new RoutineTable();
     private static StoreTable globalStoreTable = new StoreTable();
     private static StoreTable arrayRangeTable = new StoreTable();
+    private static HashMap<String,Integer> identTable = new HashMap<String,Integer>();
     private static Scope scope = null;
     private static IVirtualMachine vm /*= new VirtualMachine(null, STORE_SIZE)*/; 
     private static CodeArray codeArray = new CodeArray(STORE_SIZE);
@@ -38,6 +40,14 @@ public final class Compiler {
     
     public static StoreTable getArrayStoreTable() {
     	return arrayRangeTable;
+    }
+    
+    public static void addIdentTable(String name, int i) {
+        identTable.put(name, new Integer(i));
+    }
+    
+    public static HashMap<String, Integer> getIdentTable() {
+        return identTable;
     }
     
     public static void addArrayStoreTable(String name, Range range) {
@@ -117,7 +127,7 @@ public final class Compiler {
     public static void main(String[] args) {
 
         try {
-            InputStreamReader source = new InputStreamReader(new FileInputStream("res/code.iml"));
+            InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeVM.iml"));
             Compiler.compile(new BufferedReader(source));
 
         } catch (Exception e) {

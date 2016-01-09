@@ -8,10 +8,12 @@ import ch.fhnw.lederer.virtualmachineFS2015.IInstructions.IInstr;
 public class CodeArray implements ICodeArray {
     private IInstr[] code;
     private int size;
+    private int number;
 
     public CodeArray(int size) {
         this.code= new IInstr[size];
         this.size= size;
+        this.number = 0;
     }
 
     public int getSize() {
@@ -21,6 +23,8 @@ public class CodeArray implements ICodeArray {
     public void put(int loc, IInstr instr) throws CodeTooSmallError {
         if (loc < code.length) {
             code[loc]= instr;
+            System.out.println("Code at " + loc + " should be " + number + " instr " + instr.toString());
+            number++;
         }
         else {
             throw new CodeTooSmallError();
