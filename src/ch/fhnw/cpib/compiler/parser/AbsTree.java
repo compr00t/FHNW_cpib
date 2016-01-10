@@ -823,7 +823,7 @@ public interface AbsTree {
                 loc1 = sourceExpression.code(loc1);
                 Compiler.getcodeArray().put(loc1++, new IInstructions.Store());
             } else {
-                loc1 = ((ExprStore) sourceExpression).codeRef(loc1);
+                loc1 = ((ExprStore) sourceExpression).codeRef(loc1, true, true);
                 //Compiler.getVM().Store(loc1++);
                 Compiler.getcodeArray().put(loc1++, new IInstructions.Store());
             }
@@ -1152,9 +1152,9 @@ public interface AbsTree {
             if (expr instanceof ExprDyadic && ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT) {
                 ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
                 expr = expr1;
-                loc1 = ((ExprStore) expr).codeRef(loc);
+                loc1 = ((ExprStore) expr).codeRef(loc, false, false);  //TODO
             } else {
-                loc1 = ((ExprStore) expr).codeRef(loc);
+                loc1 = ((ExprStore) expr).codeRef(loc, false, false); //TODO
             }
 
             if (type.getValue() == TypeAttribute.BOOL) {
@@ -1433,7 +1433,14 @@ public interface AbsTree {
 
 			if (type instanceof TypedIdentArr) {
 				Range range = (Range) Compiler.getArrayStoreTable().getStore(ident.getValue());
-				int value = Integer.parseInt(expression.getValue());
+				int value = Integer.parseInt(expression.getValue()); //TODO Exception bei [n]x auch wenn n schon existiert, 
+				                                                    //Problem, Wert von n erst zur Laufzeit bekannt. Eventuell in 
+				                                                    //Code generierung Index erneut prüfen und IndexooB Exception werfen??
+				/*if (expression instanceof ExprStore){
+				    value = Integer.parseInt(((Store)Compiler.getGlobalStoreTable().getStore(expression.getValue())).getIdent());
+				}else{
+				    value = Integer.parseInt(expression.getValue());
+				}*/
 
 				if (range.getStart() > value || value > range.getEnd()) {
 					throw new ContextError("Index " + value + " out of bound: [" + range.getStart() + ":"
@@ -1632,9 +1639,9 @@ public interface AbsTree {
             
         }
 
-        public int codeRef(final int loc) throws CodeTooSmallError {
+        public int codeRef(final int loc, boolean rel, boolean ref) throws CodeTooSmallError {
             Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
-            return ((store != null) ? store.codeRef(loc) : loc);
+            return ((store != null) ? store.codeRef(loc, rel, ref) : loc);
         }
 	}
 
@@ -1664,7 +1671,7 @@ public interface AbsTree {
 		}
 
         @Override
-        int code(int loc) {
+        int code(int loc) { //TODO
             //Zuerst AllocBlock für return value
             //Parameter auf Stack legen in korrekter Form (LValue und RValue check)
             //call ablegen mit addresse der func im codeArray
@@ -1882,10 +1889,22 @@ public interface AbsTree {
 
         @Override
         public int code(final int loc) throws CodeTooSmallError {
-            int loc1 = expr1.code(loc);
+            int loc1;
+            
+            if(expr1 instanceof ExprStore){
+                loc1 = ((ExprStore) expr1).codeRef(loc, true, true);
+            }else{
+                loc1 = expr1.code(loc);
+            }
+            
 
             if (operator.getValue() != OperatorAttribute.CAND && operator.getValue() != OperatorAttribute.COR) {
-                loc1 = expr2.code(loc1);
+                
+                if(expr2 instanceof ExprStore){
+                    loc1 = ((ExprStore) expr2).codeRef(loc1, true, true);
+                }else{
+                    loc1 = expr2.code(loc1);
+                }
 
                 switch (operator.getValue()) {
                 case DOT:
@@ -2107,7 +2126,7 @@ public interface AbsTree {
             if (param.getMechMode().getValue() == ModeAttributes.COPY) {
                 loc1 = expression.code(loc);
             } else {
-                loc1 = ((ExprStore) expression).codeRef(loc);
+                loc1 = ((ExprStore) expression).codeRef(loc, false, false);  //TODO implementierung
             }
 
             return (expressionList != null ? expressionList.code(loc1) : loc1);

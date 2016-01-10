@@ -59,15 +59,18 @@ public final class Store extends Symbol {
         this.reference = reference;
     }
 
-    public int codeLoad(final int loc) throws CodeTooSmallError {
-        int loc1 = codeRef(loc);
+    public int codeLoad(final int loc) throws CodeTooSmallError {  //TODO auflösen und in codeRef handlen?
+        int loc1 = codeRef(loc, true, false); 
         //Compiler.getVM().Deref(loc1++);
         Compiler.getcodeArray().put(loc1++, new Deref());
         return loc1;
     }
 
-    public int codeRef(final int loc) throws CodeTooSmallError {
+    public int codeRef(final int loc, boolean rel, boolean ref) throws CodeTooSmallError {
         int loc1 = loc;
+        
+        this.setRelative(rel);
+        this.setReference(ref);
 
         if (relative) {
             //Compiler.getVM().LoadRel(loc1++, address);
