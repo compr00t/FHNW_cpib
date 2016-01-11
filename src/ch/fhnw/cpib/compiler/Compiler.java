@@ -120,6 +120,7 @@ public final class Compiler {
         
         System.out.println(" > Generating Code:\n");
         absTree.code(0);
+        System.out.println("\n > Maschine Code: \n");
         codeArray.resize();
         vm = new VirtualMachine(codeArray, STORE_SIZE);
     }
