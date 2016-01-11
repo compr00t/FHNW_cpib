@@ -1234,6 +1234,7 @@ public interface AbsTree {
                 loc1 = expr.code(loc);
             } else {
                 loc1 = ((ExprStore) expr).code(loc);
+                Compiler.getcodeArray().put(loc1++, new Deref());
             }
 
             if (type.getValue() == TypeAttribute.BOOL) {
