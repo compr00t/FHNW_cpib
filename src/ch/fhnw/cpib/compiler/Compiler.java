@@ -128,7 +128,7 @@ public final class Compiler {
     public static void main(String[] args) {
 
         try {
-            InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeVM.iml"));
+            InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeDebugIn.iml"));
             Compiler.compile(new BufferedReader(source));
 
         } catch (Exception e) {

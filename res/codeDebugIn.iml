@@ -6,12 +6,18 @@ global
 	var [-3:15]x:int64
 
 do
-
-	n init := 3;
+	n init := 0;
+	debugin n;
+	debugin [2]x;	
+	n := n + 2;
 	[5 + 1]x := 18 + 15;
 	[3]x := n + 1;
+	[2]x := [2]x + 1;
 	//Error im Checker: [n]x := [3]x; 
 	m init := 1;
-	debugout n	
+	debugout n	;
+	debugout [2]x;
+	debugout [3]x;
+	debugout m
 	
 endprogram

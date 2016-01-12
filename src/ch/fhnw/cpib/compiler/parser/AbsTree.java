@@ -1153,17 +1153,33 @@ public interface AbsTree {
             if (expr instanceof ExprDyadic && ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT) {
                 ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
                 expr = expr1;
-                loc1 = ((ExprStore) expr).codeRef(loc, false, false);  //TODO
-            } else {
-                loc1 = ((ExprStore) expr).codeRef(loc, false, false); //TODO
+                loc1 = ((ExprStore) expr).codeRef(loc, true, false);  //TODO
+            } else if (expr instanceof ExprArray){
+                loc1 = ((ExprArray) expr).codeRef(loc);   
+            }else{
+                loc1 = ((ExprStore) expr).codeRef(loc, true, false); //TODO
             }
 
             if (type.getValue() == TypeAttribute.BOOL) {
-                //Compiler.getVM().BoolInput(loc1++, ((ExprStore) expr).getIdent().getValue());
-                Compiler.getcodeArray().put(loc1++, new InputBool(((ExprStore) expr).getIdent().getValue()));
+                //Compiler.getVM().BoolOutput(loc1++, ((ExprStore) expr).getIdent().getValue());
+                if(expr instanceof ExprStore){
+                    Compiler.getcodeArray().put(loc1++, new InputBool(((ExprStore) expr).getIdent().getValue()));
+                }else if(expr instanceof ExprArray){
+                    Compiler.getcodeArray().put(loc1++, new InputBool(((ExprArray) expr).getIdent().getValue()));
+                }else{
+                    throw new IllegalArgumentException("Wrong Expression while code generation");
+                }
+                
             } else {
-                //Compiler.getVM().IntInput(loc1++, ((ExprStore) expr).getIdent().getValue());
-                Compiler.getcodeArray().put(loc1++, new InputInt(((ExprStore) expr).getIdent().getValue()));
+                //Compiler.getVM().IntOutput(loc1++, ((ExprStore) expr).getIdent().getValue());
+                if(expr instanceof ExprStore){
+                    Compiler.getcodeArray().put(loc1++, new InputInt(((ExprStore) expr).getIdent().getValue()));
+                }else if(expr instanceof ExprArray){
+                    Compiler.getcodeArray().put(loc1++, new InputInt(((ExprArray) expr).getIdent().getValue()));
+                }else{
+                    throw new IllegalArgumentException("Wrong Expression while code generation");
+                }
+                //Compiler.getcodeArray().put(loc1++, new OutputInt(((ExprStore) expr).getIdent().getValue()));
             }
             return (nextCmd != null ? nextCmd.code(loc1) : loc1);
         }
@@ -1484,7 +1500,6 @@ public interface AbsTree {
           
        }
 
-        @Override
         public int code(int loc) throws CodeTooSmallError {
             /*
              * TypedIdent type = Compiler.getScope().getType(ident.getValue()); if (type instanceof
@@ -1506,6 +1521,31 @@ public interface AbsTree {
             Compiler.getcodeArray().put(++loc1, new SubInt());
             Compiler.getcodeArray().put(++loc1, new AddInt());
             Compiler.getcodeArray().put(++loc1, new Deref());
+            loc1++;
+
+            return loc1;
+        }
+        
+        public int codeRef(int loc) throws CodeTooSmallError {
+            /*
+             * TypedIdent type = Compiler.getScope().getType(ident.getValue()); if (type instanceof
+             * TypedIdentArr) { Range range = (Range)
+             * Compiler.getArrayStoreTable().getStore(ident.getValue());
+             * Compiler.getcodeArray().put(loc + 1, new AllocBlock(range.getSize())); ((Range)
+             * Compiler.getArrayStoreTable().getStore(ident.getValue())).setAddress(loc + 1); return
+             * loc;
+             * 
+             * } else { Compiler.getcodeArray().put(loc + 1, new LoadImInt(expression.code(loc)));
+             * return loc + 1; }
+             */
+            Compiler.getcodeArray().put(loc, new LoadAddrRel(getArrayAdress(this.ident.getValue())));
+            int loc1 = loc + 1;
+            loc1 = this.expression.code(loc1);
+            // Compiler.getcodeArray().put(loc+1,new LoadImInt(new
+            // Integer(((ExprArray)targetExpression).expression.getValue()).intValue()));
+            Compiler.getcodeArray().put(loc1, new LoadImInt(getArrayOffset(this.ident.getValue())));
+            Compiler.getcodeArray().put(++loc1, new SubInt());
+            Compiler.getcodeArray().put(++loc1, new AddInt());
             loc1++;
 
             return loc1;
