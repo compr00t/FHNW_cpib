@@ -12,43 +12,47 @@ global
 do
 
 	b init := 0;
-	e init := 6;
+	e init := 3;
 	
-	debugin [-3]u;
-	debugin [-2]u;
-	debugin [-1]u;
-	debugin [0]u;
-	debugin [1]u;
-	debugin [2]u;
 	debugin [3]u;
+	[e]u := [3]u;
+	debugout [e]u
 	
-	[-3]s := [-3]u;
-	[-2]s := [-2]u;
-	[-1]s := [-1]u;
-	[0]s := [0]u;
-	[1]s := [1]u;
-	[2]s := [2]u;
-	[3]s := [3]u;
+	//debugin [-3]u;
+	//debugin [-2]u;
+	//debugin [-1]u;
+	//debugin [0]u;
+	//debugin [1]u;
+	//debugin [2]u;
+	//debugin [3]u;
 	
-	debugout b;
-	debugout e;
-	debugin z init;
+	//[-3]s := [-3]u;
+	//[-2]s := [-2]u;
+	//[-1]s := [-1]u;
+	//[0]s := [0]u;
+	//[1]s := [1]u;
+	//[2]s := [2]u;
+	//[3]s := [3]u;
 	
-	while b <= e do
-			b := b + 1;
-			debugout b;
-			debugout e;
-			debugin z
-	endwhile;
+	//debugout b;
+	//debugout e;
+	//debugin z init;
 	
-	debugout b;
+	//while b <= e do
+	//		b := b + 1;
+	//		debugout b;
+	//		debugout e;
+	//		debugin z
+	//endwhile;
 	
-	debugout [-3]s;
-	debugout [-2]s;
-	debugout [-1]s;
-	debugout [0]s;
-	debugout [1]s;
-	debugout [2]s;
-	debugout [3]s
+	//debugout b;
+	
+	//debugout [-3]s;
+	//debugout [-2]s;
+	//debugout [-1]s;
+	//debugout [0]s;
+	//debugout [1]s;
+	//debugout [2]s;
+	//debugout [3]s
 	
 endprogram
