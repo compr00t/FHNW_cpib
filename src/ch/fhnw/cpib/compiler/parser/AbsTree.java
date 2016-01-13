@@ -479,6 +479,7 @@ public interface AbsTree {
 			int loc1 = loc;
 			Declaration d = this;
 			boolean nextDeclNull = false;
+			int arrayStartAddress;
 
 			while (!nextDeclNull) {
 				if (d.nextDecl == null) {
@@ -489,12 +490,14 @@ public interface AbsTree {
 							.getStore(((DeclarationStore) d).typedIdent.getIdent().getValue());
 					Compiler.getcodeArray().put(loc1, new AllocBlock(range.getSize()));
 					((Range) Compiler.getArrayStoreTable()
-							.getStore(((DeclarationStore) d).typedIdent.getIdent().getValue())).setAddress(loc1);
+							.getStore(((DeclarationStore) d).typedIdent.getIdent().getValue())).setAddress(Compiler.getstackAddressHelper());
+	                Compiler.setstackAddressHelper(range.getSize());
 					loc1++;
 
 				} else {
 					Compiler.getcodeArray().put(loc1, new AllocBlock(1));
-					Compiler.addIdentTable(((DeclarationStore) d).typedIdent.getIdent().getValue(), loc1);
+					Compiler.addIdentTable(((DeclarationStore) d).typedIdent.getIdent().getValue(), Compiler.getstackAddressHelper());
+					Compiler.setstackAddressHelper(1);
 					loc1++;
 				}
 

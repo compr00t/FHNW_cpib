@@ -74,7 +74,7 @@ public final class Store extends Symbol {
 
         if (relative) {
             //Compiler.getVM().LoadRel(loc1++, address);
-            Compiler.getcodeArray().put(loc1++, new LoadAddrRel(address));
+            Compiler.getcodeArray().put(loc1++, new LoadAddrRel(Compiler.getIdentTable().get(ident)));
         } else {
             //Compiler.getVM().IntLoad(loc1++, address);
             Compiler.getcodeArray().put(loc1++, new LoadImInt(address));

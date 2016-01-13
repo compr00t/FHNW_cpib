@@ -33,6 +33,7 @@ public final class Compiler {
     private static Scope scope = null;
     private static IVirtualMachine vm /*= new VirtualMachine(null, STORE_SIZE)*/; 
     private static CodeArray codeArray = new CodeArray(STORE_SIZE);
+    private static int stackAddressHelper = 0;
     
     public static IVirtualMachine getVM() {
         return vm;
@@ -65,6 +66,15 @@ public final class Compiler {
     public static Scope getScope() {
         return scope;
     }
+    
+    public static int getstackAddressHelper() {
+        return stackAddressHelper;
+    }
+    
+    public static void setstackAddressHelper(int offset) {
+        stackAddressHelper = stackAddressHelper + offset;
+    }
+    
     
     public static ICodeArray getcodeArray() {
         return codeArray;
@@ -129,8 +139,8 @@ public final class Compiler {
 
         try {
         	//InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeVM.iml"));
-        	//InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeDebugIn.iml"));
-            InputStreamReader source = new InputStreamReader(new FileInputStream("res/code.iml"));
+        	InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeDebugIn.iml"));
+            //InputStreamReader source = new InputStreamReader(new FileInputStream("res/code.iml"));
             //InputStreamReader source = new InputStreamReader(new FileInputStream("res/varia.iml"));
             //InputStreamReader source = new InputStreamReader(new FileInputStream("res/demo1.iml"));
             Compiler.compile(new BufferedReader(source));
