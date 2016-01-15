@@ -139,10 +139,10 @@ public final class Compiler {
 
         try {
         	//InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeVM.iml"));
-        	InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeDebugIn.iml"));
+        	//InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeDebugIn.iml"));
             //InputStreamReader source = new InputStreamReader(new FileInputStream("res/code.iml"));
             //InputStreamReader source = new InputStreamReader(new FileInputStream("res/varia.iml"));
-            //InputStreamReader source = new InputStreamReader(new FileInputStream("res/demo1.iml"));
+            InputStreamReader source = new InputStreamReader(new FileInputStream("res/demo1.iml"));
             Compiler.compile(new BufferedReader(source));
 
         } catch (Exception e) {

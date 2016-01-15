@@ -11,20 +11,20 @@ global
 
 do
 
-	b init := 0;
+	b init := -3;
 	e init := 3;
 	
 	//debugin [3]u;
 	//[e]u := [3]u;
 	//debugout [e]u
 	
-	debugin [-3]u;
-	debugin [-2]u;
-	debugin [-1]u;
-	debugin [0]u;
-	debugin [1]u;
-	debugin [2]u;
-	debugin [3]u;
+	//debugin [-3]u;
+	//debugin [-2]u;
+	//debugin [-1]u;
+	//debugin [0]u;
+	//debugin [1]u;
+	//debugin [2]u;
+	//debugin [3]u;
 	
 	[-3]s := [-3]u;
 	[-2]s := [-2]u;
@@ -34,15 +34,18 @@ do
 	[2]s := [2]u;
 	[3]s := [3]u;
 	
+	[b]s := 10;
+	debugout [b]s;
+	
 	//debugout b;
 	//debugout e;
 	
-	while b <= e do
-			b := b + 1;
-			debugout b;
-			debugout e
+	//while b <= e do
+	//		b := b + 1;
+	//		debugout b
+			//debugout e
 			//debugin z
-	endwhile;
+	//endwhile;
 	
 	//debugout b;
 	

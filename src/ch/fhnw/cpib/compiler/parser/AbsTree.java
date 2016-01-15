@@ -1453,15 +1453,24 @@ public interface AbsTree {
 
 				int value = 0;
 
-				//if (Compiler.getIdentTable().containsKey(expression.getValue())) {
-				//	value = Compiler.getIdentTable().get(expression.getValue());
-				//} else {
-					value = Integer.parseInt(expression.getValue());
-				//}
+				// TODO nasty!!
+				try {
 
-				if (range.getStart() > value || value > range.getEnd()) {
-					throw new ContextError("Index " + value + " out of bound: [" + range.getStart() + ":"
-							+ range.getEnd() + "]" + ident.getValue(), ident.getLine());
+					// if
+					// (Compiler.getIdentTable().containsKey(expression.getValue()))
+					// {
+					// value =
+					// Compiler.getIdentTable().get(expression.getValue());
+					// } else {
+					value = Integer.parseInt(expression.getValue());
+					// }
+
+					if (range.getStart() > value || value > range.getEnd()) {
+						throw new ContextError("Index " + value + " out of bound: [" + range.getStart() + ":"
+								+ range.getEnd() + "]" + ident.getValue(), ident.getLine());
+					}
+				} catch (Exception ex) {
+
 				}
 			}
 
@@ -1503,15 +1512,24 @@ public interface AbsTree {
 
 				int value = 0;
 
-				//if (Compiler.getIdentTable().containsKey(expression.getValue())) {
-				//	value = Compiler.getIdentTable().get(expression.getValue());
-				//} else {
+				// TODO nasty!!
+				try {
+
+					// if
+					// (Compiler.getIdentTable().containsKey(expression.getValue()))
+					// {
+					// value =
+					// Compiler.getIdentTable().get(expression.getValue());
+					// } else {
 					value = Integer.parseInt(expression.getValue());
-				//}
-				
-				if (range.getStart() > value || value > range.getEnd()) {
-					throw new ContextError("Index " + value + " out of bound: [" + range.getStart() + ":"
-							+ range.getEnd() + "]" + ident.getValue(), ident.getLine());
+					// }
+
+					if (range.getStart() > value || value > range.getEnd()) {
+						throw new ContextError("Index " + value + " out of bound: [" + range.getStart() + ":"
+								+ range.getEnd() + "]" + ident.getValue(), ident.getLine());
+					}
+				} catch (Exception ex) {
+
 				}
 
 				// TODO Exception bei [n]x auch wenn n schon existiert,
