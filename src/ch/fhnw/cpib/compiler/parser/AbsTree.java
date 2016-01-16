@@ -822,7 +822,12 @@ public interface AbsTree {
 				Compiler.getcodeArray().put(loc,
 						new LoadAddrRel(getArrayAdress(((ExprArray) targetExpression).ident.getValue())));
 				loc1 = loc + 1;
-				loc1 = ((ExprArray) targetExpression).expression.code(loc1);
+				if(((ExprArray) targetExpression).expression instanceof ExprStore){
+				    loc1 = ((ExprStore)((ExprArray) targetExpression).expression).codeRef(loc1, true, true);
+				}else{
+				    loc1 = ((ExprArray) targetExpression).expression.code(loc1);
+				}
+				
 				// Compiler.getcodeArray().put(loc+1,new LoadImInt(new
 				// Integer(((ExprArray)targetExpression).expression.getValue()).intValue()));
 				Compiler.getcodeArray().put(loc1,
@@ -1578,7 +1583,11 @@ public interface AbsTree {
 			 */
 			Compiler.getcodeArray().put(loc, new LoadAddrRel(getArrayAdress(this.ident.getValue())));
 			int loc1 = loc + 1;
-			loc1 = this.expression.code(loc1);
+			if (this.expression instanceof ExprStore){
+			    loc1 = ((ExprStore)this.expression).codeRef(loc1, true , true);
+			}else{
+			    loc1 = this.expression.code(loc1);
+			}
 			// Compiler.getcodeArray().put(loc+1,new LoadImInt(new
 			// Integer(((ExprArray)targetExpression).expression.getValue()).intValue()));
 			Compiler.getcodeArray().put(loc1, new LoadImInt(getArrayOffset(this.ident.getValue())));

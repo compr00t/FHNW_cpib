@@ -3,8 +3,7 @@ global
 
 	var b:int64;
 	var e:int64;
-	//var r:int64;
-	//var z:int64;
+	var r:int64;
 	
 	var [-3:3]u:int64;
 	var [-3:3]s:int64
@@ -14,17 +13,17 @@ do
 	b init := -3;
 	e init := 3;
 	
-	//debugin [3]u;
-	//[e]u := [3]u;
-	//debugout [e]u
+	debugin [3]u;
+	[e]u := [3]u;
+	debugout [e]u;
 	
-	//debugin [-3]u;
-	//debugin [-2]u;
-	//debugin [-1]u;
-	//debugin [0]u;
-	//debugin [1]u;
-	//debugin [2]u;
-	//debugin [3]u;
+	debugin [-3]u;
+	debugin [-2]u;
+	debugin [-1]u;
+	debugin [0]u;
+	debugin [1]u;
+	debugin [2]u;
+	debugin [3]u;
 	
 	[-3]s := [-3]u;
 	[-2]s := [-2]u;
@@ -34,20 +33,19 @@ do
 	[2]s := [2]u;
 	[3]s := [3]u;
 	
-	[b]s := 10;
-	debugout [b]s;
+	[b]u := 10;
+	debugout [b]u;
 	
-	//debugout b;
-	//debugout e;
+	debugout b;
+	debugout e;
 	
-	//while b <= e do
-	//		b := b + 1;
-	//		debugout b
-			//debugout e
-			//debugin z
-	//endwhile;
+	while b <= e do
+			b := b + 1;
+			debugout b;
+			debugout e
+	endwhile;
 	
-	//debugout b;
+	debugout b;
 	
 	debugout [-3]s;
 	debugout [-2]s;

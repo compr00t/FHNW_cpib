@@ -12,6 +12,8 @@ do
 	[3]x := n + 1;
 	//Error im Checker: [n]x := [3]x; 
 	m init := 1;
+	[1]x := 28;
+	debugout [m]x;
 	debugout n	
 	
 endprogram
