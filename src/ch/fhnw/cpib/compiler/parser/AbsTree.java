@@ -472,10 +472,20 @@ public interface AbsTree {
 				}
 			}
 
-			return store;
-		}
+            return store;
+        }
 
-		public int code(final int loc) throws CodeTooSmallError {
+        public int getArrayAddress(String s) {
+            return ((Range) Compiler.getArrayStoreTable().getStore(s)).getAddress();
+
+        }
+
+        public int getArrayOffset(String s) {
+            return ((Range) Compiler.getArrayStoreTable().getStore(s)).getOffset();
+
+        }
+
+        public int code(final int loc) throws CodeTooSmallError {
 			int loc1 = loc;
 			Declaration d = this;
 			boolean nextDeclNull = false;
@@ -486,11 +496,15 @@ public interface AbsTree {
 					nextDeclNull = true;
 				}
 				if (((DeclarationStore) d).typedIdent instanceof TypedIdentArr) {
-					Range range = (Range) Compiler.getArrayStoreTable()
-							.getStore(((DeclarationStore) d).typedIdent.getIdent().getValue());
+					Range range = (Range) Compiler.getArrayStoreTable().getStore(((DeclarationStore) d).typedIdent.getIdent().getValue());
 					Compiler.getcodeArray().put(loc1, new AllocBlock(range.getSize()));
-					((Range) Compiler.getArrayStoreTable()
-							.getStore(((DeclarationStore) d).typedIdent.getIdent().getValue())).setAddress(Compiler.getstackAddressHelper());
+					((Range) Compiler.getArrayStoreTable().getStore(((DeclarationStore) d).typedIdent.getIdent().getValue())).setAddress(Compiler.getstackAddressHelper());
+	                
+	                for(int i = 0; i<range.getSize();i++){
+	                    Compiler.getcodeArray().put(++loc1, new LoadAddrRel(Compiler.getstackAddressHelper()+i));
+	                    Compiler.getcodeArray().put(++loc1, new LoadImInt(0));
+	                    Compiler.getcodeArray().put(++loc1, new IInstructions.Store());
+	                }
 	                Compiler.setstackAddressHelper(range.getSize());
 					loc1++;
 
