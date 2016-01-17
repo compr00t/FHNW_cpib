@@ -14,6 +14,7 @@ do
 	m init := 1;
 	[1]x := 28;
 	debugout [m]x;
+	debugout [n]x;
 	debugout n	
 	
 endprogram
