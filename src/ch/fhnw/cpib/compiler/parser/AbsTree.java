@@ -1540,7 +1540,7 @@ public interface AbsTree {
 
 			if (isInit) {
 
-				if (canInit) {
+				if (canInit && !(type instanceof TypedIdentArr)) {
 					throw new ContextError("Store can not be initialized here " + "(loop)!", ident.getLine());
 				}
 

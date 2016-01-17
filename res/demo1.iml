@@ -1,58 +1,33 @@
 program demo()
 global
 
-	var b:int64;
-	var e:int64;
-	var r:int64;
+	var start:int64;
+	var end:int64;
+	var count:int64;
 	
-	var [-3:3]u:int64;
-	var [-3:3]s:int64
+	var [-3:3]unsorted:int64;
+	var [-3:3]sorted:int64
 
 do
 
-	b init := -3;
-	e init := 3;
+	debugin start init;
+	debugin end init;
 	
-	debugin [3]u;
-	[e]u := [3]u;
-	debugout [e]u;
+	// counter setzen
+	count init := start;
 	
-	debugin [-3]u;
-	debugin [-2]u;
-	debugin [-1]u;
-	debugin [0]u;
-	debugin [1]u;
-	debugin [2]u;
-	debugin [3]u;
-	
-	[-3]s := [-3]u;
-	[-2]s := [-2]u;
-	[-1]s := [-1]u;
-	[0]s := [0]u;
-	[1]s := [1]u;
-	[2]s := [2]u;
-	[3]s := [3]u;
-	
-	[b]u := 10;
-	debugout [b]u;
-	
-	debugout b;
-	debugout e;
-	
-	while b <= e do
-			b := b + 1;
-			debugout b;
-			debugout e
+	// abfüllen
+	while end >= count do
+		debugin [count]unsorted;
+		count := count + 1
 	endwhile;
 	
-	debugout b;
+	// counter setzen
+	count := start;
 	
-	debugout [-3]s;
-	debugout [-2]s;
-	debugout [-1]s;
-	debugout [0]s;
-	debugout [1]s;
-	debugout [2]s;
-	debugout [3]s
-	
+	// ausgeben
+	while end >= count do
+		debugout [count]unsorted;
+		count := count + 1
+	endwhile
 endprogram
