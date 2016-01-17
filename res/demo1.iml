@@ -10,9 +10,9 @@ global
 
 do
 
-	debugin start init;
-	debugin end init;
-	
+	start init := -3;
+	end init := 3;
+		
 	// counter setzen
 	count init := start;
 	
