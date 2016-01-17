@@ -74,11 +74,17 @@ public final class Store extends Symbol {
         
         if (relative && routine) {
             //Compiler.getVM().LoadRel(loc1++, address);
-            Compiler.getcodeArray().put(loc1++, new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident)[0])));
+            if(Compiler.getprocIdentTable().get(ident)[1].equals("COPY")){
+                Compiler.getcodeArray().put(loc1++, new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident)[0])));
+            }else{
+                Compiler.getcodeArray().put(loc1++, new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident)[0])));
+                Compiler.getcodeArray().put(loc1++, new Deref());
+            }
+                    
+            
         }else if(relative){
             Compiler.getcodeArray().put(loc1++, new LoadAddrRel(Compiler.getIdentTable().get(ident)));
         } else {
-            
             //Compiler.getVM().IntLoad(loc1++, address);
             Compiler.getcodeArray().put(loc1++, new LoadImInt(address));
         }

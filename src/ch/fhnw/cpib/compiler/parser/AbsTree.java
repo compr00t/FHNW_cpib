@@ -1827,11 +1827,12 @@ public interface AbsTree {
 		@Override
 		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
+			int loc1 = loc;
             if (routine) {
                 if (Compiler.getprocIdentTable().containsKey(ident.getValue())) {
-                    Compiler.getcodeArray().put(loc,
-                            new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident.getValue())[0])));
-                    return loc + 1;
+                    //Compiler.getcodeArray().put(loc, new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident.getValue())[0])));
+                    loc1 = store.codeRef(loc, true, false, routine);
+                    return loc1;
                 } else {
                     Compiler.addIdentTable(ident.getValue(), loc);
                     return ((store != null) ? store.codeLoad(loc, routine) : loc);
