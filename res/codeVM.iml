@@ -10,7 +10,7 @@ do
 	n init := 3;
 	[5 + 1]x := 18 + 15;
 	[3]x := n + 1;
-	//Error im Checker: [n]x := [3]x; 
+	[n]x := [3]x; 
 	m init := 1;
 	[1]x := 28;
 	debugout [m]x;

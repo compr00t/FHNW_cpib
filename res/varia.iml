@@ -4,12 +4,12 @@ global
 	var n:int64;
 	var m:int64;
 	var q:int64;
-	var [-8:10]x:int64;
+	var r:int64;
+	var [-8:10]x:int64
 	
 	//Store already declared: x
 	//var [0:10]x:int64;
 	
-	var r:int64
 do
 	m init := 0;
 	n init := 0;
@@ -31,6 +31,6 @@ do
 	//[0]x := [-1]x + 2 + [-2]x;
 	
 	
-	debugout q;
-	debugout r
+	debugout [4]x;
+	debugout n
 endprogram

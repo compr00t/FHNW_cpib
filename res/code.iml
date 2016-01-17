@@ -1,5 +1,6 @@
 program intDiv()
 global
+	
 	proc divide(copy m:int64, copy n:int64, ref var q:int64, ref var r:int64)
 	do
 	
@@ -20,15 +21,16 @@ global
 	//	 q init := 0
 	// endproc;
 
+	
+	//Store already declared: x
+	//var [0:10]x:int64;
 	var n:int64;
 	var m:int64;
 	var q:int64;
 	var [-8:10]x:int64;
-	
-	//Store already declared: x
-	//var [0:10]x:int64;
-	
 	var r:int64
+	
+
 do
 	debugin m init;
 	debugin n init;

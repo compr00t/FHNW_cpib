@@ -57,7 +57,7 @@ public class VirtualMachine implements IVirtualMachine {
         this.code= new IExecInstr[code.getSize()];
         for (int i= 0; i < code.getSize(); i++) {
             this.code[i]= code.get(i).toExecInstr(this);
-            System.out.println(this.code[i]);
+            System.out.println(i + ": " + this.code[i]);
         }
     }
 
@@ -278,6 +278,7 @@ public class VirtualMachine implements IVirtualMachine {
         public void execute()
         {
             sp= sp - 1;
+            System.out.println(sp);
             store[sp-1]= Data.intGT(store[sp-1], store[sp]);
             pc= pc + 1;
         }
@@ -296,6 +297,7 @@ public class VirtualMachine implements IVirtualMachine {
         public void execute()
         {
             sp= sp - 1;
+            System.out.println(sp);
             store[sp-1]= Data.intGE(store[sp-1], store[sp]);
             pc= pc + 1;
         }

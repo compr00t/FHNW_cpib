@@ -14,6 +14,8 @@ import ch.fhnw.cpib.compiler.context.Range;
 import ch.fhnw.cpib.compiler.exception.ContextError;
 import ch.fhnw.cpib.compiler.exception.GrammarError;
 import ch.fhnw.cpib.compiler.parser.AbsTree;
+import ch.fhnw.cpib.compiler.parser.AbsTree.Declaration;
+import ch.fhnw.cpib.compiler.parser.AbsTree.DeclarationProcedure;
 import ch.fhnw.cpib.compiler.parser.ConcTree;
 import ch.fhnw.cpib.compiler.parser.Parser;
 import ch.fhnw.cpib.compiler.scanner.ITokenList;
@@ -34,6 +36,10 @@ public final class Compiler {
     private static IVirtualMachine vm /*= new VirtualMachine(null, STORE_SIZE)*/; 
     private static CodeArray codeArray = new CodeArray(STORE_SIZE);
     private static int stackAddressHelper = 0;
+    private static DeclarationProcedure declaration;
+    
+    //private static HashMap<String,String> procidentTable = new HashMap<String,String>();
+    //private static CodeArray tempcodeArray = new CodeArray(STORE_SIZE);
     
     public static IVirtualMachine getVM() {
         return vm;
@@ -42,6 +48,10 @@ public final class Compiler {
     public static StoreTable getArrayStoreTable() {
     	return arrayRangeTable;
     }
+    
+    //public static void addprocIdentTable(String routine, String ident) {
+    //    procidentTable.put(routine, ident);
+    //}
     
     public static void addIdentTable(String name, int i) {
         identTable.put(name, new Integer(i));
@@ -79,6 +89,10 @@ public final class Compiler {
     public static ICodeArray getcodeArray() {
         return codeArray;
     }
+    
+    //public static ICodeArray gettempcodeArray() {
+    //    return tempcodeArray;
+    //}
 
     public static void setScope(final Scope scope) {
         Compiler.scope = scope;
@@ -141,8 +155,8 @@ public final class Compiler {
         	//InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeVM.iml"));
         	//InputStreamReader source = new InputStreamReader(new FileInputStream("res/codeDebugIn.iml"));
             //InputStreamReader source = new InputStreamReader(new FileInputStream("res/code.iml"));
-            //InputStreamReader source = new InputStreamReader(new FileInputStream("res/varia.iml"));
-            InputStreamReader source = new InputStreamReader(new FileInputStream("res/demo1.iml"));
+            InputStreamReader source = new InputStreamReader(new FileInputStream("res/varia.iml"));
+            //InputStreamReader source = new InputStreamReader(new FileInputStream("res/demo1.iml"));
             Compiler.compile(new BufferedReader(source));
 
         } catch (Exception e) {

@@ -92,14 +92,21 @@ public interface AbsTree {
 		public void code(final int loc) throws CodeTooSmallError {
 
 			int loc1 = loc;
+			int loc2 = loc;
 
 			if (declaration != null)
-				loc1 = declaration.code(loc1);
+			    if(declaration instanceof DeclarationProcedure || declaration instanceof DeclarationFunction){
+			        loc1 = declaration.nextDecl.code(loc1);
+			        loc2 = declaration.code(loc1+1);
+			        Compiler.getcodeArray().put(loc1, new UncondJump(loc2));
+			    }else{
+			        loc2 = declaration.code(loc1);
+			    }
+			loc2 = cmd.code(loc2);
 			for (Routine routine : Compiler.getRoutineTable().getTable().values()) {
 				routine.codeCalls();
 			}
-			loc1 = cmd.code(loc1);
-			Compiler.getcodeArray().put(loc1, new Stop());
+			Compiler.getcodeArray().put(loc2, new Stop());
 
 			/*
 			 * int loc1 = cmd.code(loc); Compiler.getcodeArray().put(loc1, new
@@ -260,8 +267,15 @@ public interface AbsTree {
 			return 0;
 		}
 
-		public int code(int loc) {
-			return 0;
+		public int code(int loc) throws CodeTooSmallError {
+		    Compiler.getcodeArray().put(loc, new AllocBlock(1));
+            int loc1 = loc + 1;
+            
+            // Zuerst AllocBlock für return value
+            // Parameter auf Stack legen in korrekter Form (LValue und RValue
+            // check)
+            // call ablegen mit addresse der func im codeArray
+		    return loc1;
 		}
 	}
 
@@ -360,16 +374,33 @@ public interface AbsTree {
 			Routine routine = Compiler.getRoutineTable().getRoutine(ident.getValue());
 			Compiler.setScope(routine.getScope());
 			routine.setAddress(loc1);
+			int i = 0 - routine.getParamList().size();
+			for (ch.fhnw.cpib.compiler.context.Parameter p : routine.getParamList()){
+			    if (p.getMechMode().getValue().toString().toUpperCase().equals("COPY")){
+			        //Compiler.getcodeArray().put(loc1, new AllocBlock(1));
+			        Compiler.getcodeArray().put(loc1, new LoadAddrRel(i));
+			        //Compiler.getcodeArray().put(loc1, new Deref());
+			        //Compiler.getcodeArray().put(loc1, new IInstructions.Store());
+			    }else{
+			        //Compiler.getcodeArray().put(loc1, new AllocBlock(1));
+			        Compiler.getcodeArray().put(loc1, new LoadAddrRel(i));
+			        //Compiler.getcodeArray().put(loc1, new LoadAddrRel(Compiler.getIdentTable().get(p.getType().getIdent()).intValue()));
+			        //Compiler.getcodeArray().put(loc1, new IInstructions.Store());
+			    }
+			    i += 1;
+			    ++loc1;
+			}
+			//LoadAddrRel of Variables.
 			// Compiler.getVM().Enter(loc1++, routine.getInOutCopyCount() +
 			// getCount(), 0);
-			Compiler.getcodeArray().put(loc1, new AllocBlock(1));
-			// loc1 = param.codeIn(loc1, routine.getParamList().size(), 0);
+			//Compiler.getcodeArray().put(loc1, new AllocBlock(1));
+			//loc1 = param.codeIn(loc1, routine.getParamList().size(), 0);
 			loc1 = cmd.code(loc1);
-			// loc1 = param.codeOut(loc1, routine.getParamList().size(), 0);
+			//loc1 = param.codeOut(loc1, routine.getParamList().size(), 0);
 			// Compiler.getVM().Return(loc1++, 0);
 			Compiler.getcodeArray().put(loc1, new Return(1));
-			Compiler.setScope(null);
-			return loc1;
+			//Compiler.setScope(null);
+			return ++loc1;
 			// return (nextDecl!=null?nextDecl.code(loc1):loc1);
 		}
 	}
@@ -1836,11 +1867,8 @@ public interface AbsTree {
 		}
 
 		@Override
-		int code(int loc) { // TODO
-			// Zuerst AllocBlock für return value
-			// Parameter auf Stack legen in korrekter Form (LValue und RValue
-			// check)
-			// call ablegen mit addresse der func im codeArray
+		int code(int loc) throws CodeTooSmallError { // TODO
+		    
 			return 0;
 		}
 
@@ -2106,15 +2134,15 @@ public interface AbsTree {
 					break;
 				case GT:
 					// Compiler.getVM().IntGT(loc1);
-					Compiler.getcodeArray().put(loc1, new LtInt());
+					Compiler.getcodeArray().put(loc1, new GtInt());
 					break;
 				case LT:
 					// Compiler.getVM().IntLT(loc1);
-					Compiler.getcodeArray().put(loc1, new GeInt());
+					Compiler.getcodeArray().put(loc1, new LtInt());
 					break;
 				case GE:
 					// Compiler.getVM().IntGE(loc1);
-					Compiler.getcodeArray().put(loc1, new GtInt());
+					Compiler.getcodeArray().put(loc1, new GeInt());
 					break;
 				case LE:
 					// Compiler.getVM().IntLE(loc1);
@@ -2292,9 +2320,13 @@ public interface AbsTree {
 		public int code(final int loc) throws CodeTooSmallError {
 			int loc1;
 			if (param.getMechMode().getValue() == ModeAttributes.COPY) {
-				loc1 = expression.code(loc);
+				if(expression instanceof ExprStore){
+				    loc1 = ((ExprStore) expression).codeRef(loc, true, true);
+				}else{
+				    loc1 = expression.code(loc);   
+				}
 			} else {
-				loc1 = ((ExprStore) expression).codeRef(loc, false, false); // TODO
+				loc1 = ((ExprStore) expression).codeRef(loc, true, false); // TODO
 																			// implementierung
 			}
 
