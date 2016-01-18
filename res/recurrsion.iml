@@ -1,0 +1,20 @@
+program fibunacci()
+global
+	
+	fun fib(copy a:int64) returns r:int64
+ 	do
+    	if a <= 1 then
+			r init := a
+		else
+			r init := fib(a - 1) + fib(a - 2)
+		endif; 
+		debugout a
+ 	endfun;
+	
+	var a:int64
+
+do
+	a init := 13;	
+	a := fibonacciRek(a);
+	debugout a
+endprogram

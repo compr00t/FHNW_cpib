@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 //import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
 import ch.fhnw.cpib.compiler.scanner.enums.ModeAttributes;
 import ch.fhnw.cpib.compiler.scanner.enums.OperatorAttribute;
@@ -13,6 +14,7 @@ import ch.fhnw.cpib.compiler.scanner.enums.Terminals;
 import ch.fhnw.cpib.compiler.scanner.enums.TypeAttribute;
 import ch.fhnw.cpib.compiler.scanner.token.*;
 import ch.fhnw.cpib.compiler.scanner.token.Mode.*;
+import ch.fhnw.cpib.compiler.context.Function;
 //import ch.fhnw.lederer.virtualmachineFS2015.*;
 import ch.fhnw.cpib.compiler.context.GlobImp;
 import ch.fhnw.cpib.compiler.context.Procedure;
@@ -211,27 +213,31 @@ public interface AbsTree {
 		private final Ident ident;
 		private final Parameter param;
 		private final DeclarationStore returnDecl;
-		private final GlobalImport globImp;
-		private final Declaration dcl;
+		private final GlobalImport globalImport;
+		private final Declaration decl;
 		private final Declaration nextDecl;
 		private final Cmd cmd;
 
-		public DeclarationFunction(Ident ident, Parameter param, DeclarationStore returnDecl, GlobalImport globImp,
-				Declaration dcl, Cmd cmd, Declaration nextDecl) {
+		public DeclarationFunction(Ident ident, Parameter param, DeclarationStore returnDecl, GlobalImport globalImport,
+				Declaration decl, Cmd cmd, Declaration nextDecl) {
 			super(nextDecl);
 			this.ident = ident;
 			this.param = param;
 			this.returnDecl = returnDecl;
-			this.globImp = globImp;
-			this.dcl = dcl;
+			this.globalImport = globalImport;
+			this.decl = decl;
 			this.nextDecl = nextDecl;
 			this.cmd = cmd;
 		}
 
 		public String toString(String indent) {
-			return indent + "<DeclFun>\n" + ident.toString(indent + '\t') + param.toString(indent + '\t')
-					+ returnDecl.toString(indent + '\t') + globImp.toString(indent + '\t') + dcl.toString(indent + '\t')
-					+ cmd.toString(indent + '\t') + super.toString(indent + '\t') + indent + "</DeclFun>\n";
+			//return indent + "<DeclFun>\n" + ident.toString(indent + '\t') + param.toString(indent + '\t')
+			//		+ returnDecl.toString(indent + '\t') + globImp.toString(indent + '\t') + dcl.toString(indent + '\t')
+			//		+ cmd.toString(indent + '\t') + super.toString(indent + '\t') + indent + "</DeclFun>\n";
+			return indent + "<DeclarationFunction>\n" + ident.toString(indent + '\t') + param.toString(indent + '\t') + returnDecl.toString(indent + '\t')
+                    + (globalImport != null ? globalImport.toString(indent + '\t') : "")
+                    + (decl != null ? decl.toString(indent + '\t') : "") + cmd.toString(indent + '\t')
+                    + super.toString(indent + '\t') + indent + "</DeclarationFunction>\n";
 		}
 
 		public Cmd getCmd() {
@@ -243,7 +249,7 @@ public interface AbsTree {
 		}
 
 		public Declaration getDecl() {
-			return dcl;
+			return decl;
 		}
 
 		public Parameter getParam() {
@@ -251,7 +257,7 @@ public interface AbsTree {
 		}
 
 		public GlobalImport getGlobImp() {
-			return globImp;
+			return globalImport;
 		}
 
 		public DeclarationStore getReturnDecl() {
@@ -259,23 +265,75 @@ public interface AbsTree {
 		}
 
 		public void checkDeclaration() throws ContextError {
-			if (nextDecl != null)
-				nextDecl.checkDeclaration();
+		    Function function = new Function(ident.getValue());
+            Compiler.setScope(function.getScope());
+
+            if (!Compiler.getRoutineTable().addRoutine(function)) {
+                throw new ContextError("Routine already declared: " + ident.getValue(), ident.getLine());
+            }
+
+            param.check(function);
+            Compiler.setScope(null);
+            if (nextDecl != null)
+                nextDecl.checkDeclaration();
 		}
 
 		public int check(int locals) throws ContextError {
-			return 0;
+	         if (locals >= 0) {
+	                throw new ContextError("Function declarations are only allowed globally!", ident.getLine());
+	            }
+	            Routine routine = Compiler.getRoutineTable().getRoutine(ident.getValue());
+	            Compiler.setScope(routine.getScope());
+	            if (globalImport != null)
+	                globalImport.check(routine);
+	            int localsCount = param.calculateAddress(routine.getParamList().size(), 0);
+
+	            if (decl != null)
+	                decl.check(localsCount);
+
+	            //cmd.check(false);
+	            Compiler.setScope(null);
+	            return -1;
 		}
 
-		public int code(int loc) throws CodeTooSmallError {
-		    Compiler.getcodeArray().put(loc, new AllocBlock(1));
-            int loc1 = loc + 1;
-            
+		public int code(int loc) throws CodeTooSmallError {   
+		    int loc1 = loc;
+            Routine routine = Compiler.getRoutineTable().getRoutine(ident.getValue());
+            Compiler.setScope(routine.getScope());
+            routine.setAddress(loc1);
+            int i = 0 - routine.getParamList().size();
+            for (ch.fhnw.cpib.compiler.context.Parameter p : routine.getParamList()){
+                if (p.getMechMode().getValue().toString().toUpperCase().equals("COPY")){
+                    //Compiler.getcodeArray().put(loc1, new AllocBlock(1));
+                    Compiler.getprocIdentTable().put(p.getType().getIdent().getValue(), new String[] {i+"",p.getMechMode().getValue().toString()});
+                    //Compiler.getcodeArray().put(loc1, new Deref());
+                    //Compiler.getcodeArray().put(loc1, new IInstructions.Store());
+                }else{
+                    //Compiler.getcodeArray().put(loc1, new AllocBlock(1));
+                    Compiler.getprocIdentTable().put(p.getType().getIdent().getValue(), new String[] {i+"","REF"});
+                    //Compiler.getcodeArray().put(loc1, new LoadAddrRel(Compiler.getIdentTable().get(p.getType().getIdent()).intValue()));
+                    //Compiler.getcodeArray().put(loc1, new IInstructions.Store());
+                }
+                i += 1;
+            }
+            returnDecl.code(loc1);
+            //LoadAddrRel of Variables.
+            // Compiler.getVM().Enter(loc1++, routine.getInOutCopyCount() +
+            // getCount(), 0);
+            //Compiler.getcodeArray().put(loc1, new AllocBlock(1));
+            //loc1 = param.codeIn(loc1, routine.getParamList().size(), 0);
+            loc1 = cmd.code(loc1, true);
+            //loc1 = param.codeOut(loc1, routine.getParamList().size(), 0);
+            // Compiler.getVM().Return(loc1++, 0);
+            Compiler.getcodeArray().put(loc1, new Return(1 + 1));
+            //Compiler.setScope(null);
+            return ++loc1;
+            // return (nextDecl!=null?nextDecl.code(loc1):loc1);
+            // return (nextDecl!=null?nextDecl.code(loc1):loc1);
             // Zuerst AllocBlock für return value
             // Parameter auf Stack legen in korrekter Form (LValue und RValue
             // check)
             // call ablegen mit addresse der func im codeArray
-		    return loc1;
 		}
 	}
 
@@ -1786,7 +1844,11 @@ public interface AbsTree {
 		public TypedIdent checkL(final boolean canInit) throws ContextError {
 
 			TypedIdent type = Compiler.getScope().getType(ident.getValue());
-
+			
+			//if(ident.getValue().equals("r")){
+			    
+			//    return new TypedIdentType(ident, new Type(TypeAttribute.INT64));
+			//}
 			if (type == null) {
 				throw new ContextError("Ident " + ident.getValue() + " not declared", ident.getLine());
 			}
