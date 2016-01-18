@@ -59,21 +59,30 @@ public final class Store extends Symbol {
         this.reference = reference;
     }
 
-    public int codeLoad(final int loc) throws CodeTooSmallError {  //TODO auflösen und in codeRef handlen?
-        int loc1 = codeRef(loc, true, false); 
+    public int codeLoad(final int loc, boolean routine) throws CodeTooSmallError {  //TODO auflösen und in codeRef handlen?
+        int loc1 = codeRef(loc, true, false, routine); 
         //Compiler.getVM().Deref(loc1++);
         Compiler.getcodeArray().put(loc1++, new Deref());
         return loc1;
     }
 
-    public int codeRef(final int loc, boolean rel, boolean ref) throws CodeTooSmallError {
+    public int codeRef(final int loc, boolean rel, boolean ref, boolean routine) throws CodeTooSmallError {
         int loc1 = loc;
         
         this.setRelative(rel);
         this.setReference(ref);
-
-        if (relative) {
+        
+        if (relative && routine) {
             //Compiler.getVM().LoadRel(loc1++, address);
+            if(Compiler.getprocIdentTable().get(ident)[1].equals("COPY")){
+                Compiler.getcodeArray().put(loc1++, new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident)[0])));
+            }else{
+                Compiler.getcodeArray().put(loc1++, new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident)[0])));
+                Compiler.getcodeArray().put(loc1++, new Deref());
+            }
+                    
+            
+        }else if(relative){
             Compiler.getcodeArray().put(loc1++, new LoadAddrRel(Compiler.getIdentTable().get(ident)));
         } else {
             //Compiler.getVM().IntLoad(loc1++, address);

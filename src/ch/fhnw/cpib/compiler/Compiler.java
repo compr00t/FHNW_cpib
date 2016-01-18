@@ -38,7 +38,7 @@ public final class Compiler {
     private static int stackAddressHelper = 0;
     private static DeclarationProcedure declaration;
     
-    //private static HashMap<String,String> procidentTable = new HashMap<String,String>();
+    private static HashMap<String,String[]> procidentTable = new HashMap<String,String[]>();
     //private static CodeArray tempcodeArray = new CodeArray(STORE_SIZE);
     
     public static IVirtualMachine getVM() {
@@ -49,9 +49,13 @@ public final class Compiler {
     	return arrayRangeTable;
     }
     
-    //public static void addprocIdentTable(String routine, String ident) {
-    //    procidentTable.put(routine, ident);
-    //}
+    public static HashMap<String, String[]> getprocIdentTable() {
+        return procidentTable;
+    }
+    
+    public static void addprocIdentTable(String ident, String[] posMech) {
+        procidentTable.put(ident, posMech);
+    }
     
     public static void addIdentTable(String name, int i) {
         identTable.put(name, new Integer(i));

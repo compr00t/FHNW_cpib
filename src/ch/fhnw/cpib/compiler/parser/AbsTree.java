@@ -102,7 +102,7 @@ public interface AbsTree {
 			    }else{
 			        loc2 = declaration.code(loc1);
 			    }
-			loc2 = cmd.code(loc2);
+			loc2 = cmd.code(loc2, false);
 			for (Routine routine : Compiler.getRoutineTable().getTable().values()) {
 				routine.codeCalls();
 			}
@@ -378,24 +378,23 @@ public interface AbsTree {
 			for (ch.fhnw.cpib.compiler.context.Parameter p : routine.getParamList()){
 			    if (p.getMechMode().getValue().toString().toUpperCase().equals("COPY")){
 			        //Compiler.getcodeArray().put(loc1, new AllocBlock(1));
-			        Compiler.getcodeArray().put(loc1, new LoadAddrRel(i));
+			        Compiler.getprocIdentTable().put(p.getType().getIdent().getValue(), new String[] {i+"",p.getMechMode().getValue().toString()});
 			        //Compiler.getcodeArray().put(loc1, new Deref());
 			        //Compiler.getcodeArray().put(loc1, new IInstructions.Store());
 			    }else{
 			        //Compiler.getcodeArray().put(loc1, new AllocBlock(1));
-			        Compiler.getcodeArray().put(loc1, new LoadAddrRel(i));
+			        Compiler.getprocIdentTable().put(p.getType().getIdent().getValue(), new String[] {i+"","REF"});
 			        //Compiler.getcodeArray().put(loc1, new LoadAddrRel(Compiler.getIdentTable().get(p.getType().getIdent()).intValue()));
 			        //Compiler.getcodeArray().put(loc1, new IInstructions.Store());
 			    }
 			    i += 1;
-			    ++loc1;
 			}
 			//LoadAddrRel of Variables.
 			// Compiler.getVM().Enter(loc1++, routine.getInOutCopyCount() +
 			// getCount(), 0);
 			//Compiler.getcodeArray().put(loc1, new AllocBlock(1));
 			//loc1 = param.codeIn(loc1, routine.getParamList().size(), 0);
-			loc1 = cmd.code(loc1);
+			loc1 = cmd.code(loc1, true);
 			//loc1 = param.codeOut(loc1, routine.getParamList().size(), 0);
 			// Compiler.getVM().Return(loc1++, 0);
 			Compiler.getcodeArray().put(loc1, new Return(1));
@@ -691,7 +690,7 @@ public interface AbsTree {
 
 		public abstract void check(boolean canInit) throws ContextError;
 
-		public abstract int code(int loc) throws CodeTooSmallError;
+		public abstract int code(int loc, boolean routine) throws CodeTooSmallError;
 	}
 
 	public class CmdSkip extends Cmd {
@@ -726,8 +725,8 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(int loc) throws CodeTooSmallError {
-			return (nextCmd != null ? nextCmd.code(loc) : loc);
+		public int code(int loc, boolean routine) throws CodeTooSmallError {
+			return (nextCmd != null ? nextCmd.code(loc, routine) : loc);
 		}
 	}
 
@@ -850,7 +849,7 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(final int loc) throws CodeTooSmallError {
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			int loc1;
 
 			if (sourceExpression instanceof ExprDyadic
@@ -868,9 +867,9 @@ public interface AbsTree {
 						new LoadAddrRel(getArrayAdress(((ExprArray) targetExpression).ident.getValue())));
 				loc1 = loc + 1;
 				if(((ExprArray) targetExpression).expression instanceof ExprStore){
-				    loc1 = ((ExprStore)((ExprArray) targetExpression).expression).codeRef(loc1, true, true);
+				    loc1 = ((ExprStore)((ExprArray) targetExpression).expression).codeRef(loc1, true, true, routine);
 				}else{
-				    loc1 = ((ExprArray) targetExpression).expression.code(loc1);
+				    loc1 = ((ExprArray) targetExpression).expression.code(loc1, routine);
 				}
 				
 				// Compiler.getcodeArray().put(loc+1,new LoadImInt(new
@@ -881,18 +880,18 @@ public interface AbsTree {
 				Compiler.getcodeArray().put(++loc1, new AddInt());
 				loc1++;
 			} else {
-				loc1 = targetExpression.code(loc);
+				loc1 = targetExpression.code(loc, routine);
 			}
 
 			if (!(sourceExpression instanceof ExprStore)) {
-				loc1 = sourceExpression.code(loc1);
+				loc1 = sourceExpression.code(loc1, routine);
 				Compiler.getcodeArray().put(loc1++, new IInstructions.Store());
 			} else {
-				loc1 = ((ExprStore) sourceExpression).codeRef(loc1, true, true);
+				loc1 = ((ExprStore) sourceExpression).codeRef(loc1, true, true, routine);
 				// Compiler.getVM().Store(loc1++);
 				Compiler.getcodeArray().put(loc1++, new IInstructions.Store());
 			}
-			return (nextCmd != null ? nextCmd.code(loc1) : loc1);
+			return (nextCmd != null ? nextCmd.code(loc1, routine) : loc1);
 		}
 	}
 
@@ -988,15 +987,15 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(final int loc) throws CodeTooSmallError {
-			int loc1 = expression.code(loc);
-			int loc2 = ifCmd.code(loc1 + 1);
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
+			int loc1 = expression.code(loc, routine);
+			int loc2 = ifCmd.code(loc1 + 1, routine);
 			// Compiler.getVM().CondJump(loc1, loc2 + 1);
 			Compiler.getcodeArray().put(loc1, new CondJump(loc2 + 1));
-			int loc3 = elseCmd.code(loc2 + 1);
+			int loc3 = elseCmd.code(loc2 + 1, routine);
 			// Compiler.getVM().UncondJump(loc2, loc3);
 			Compiler.getcodeArray().put(loc2, new UncondJump(loc3));
-			return (nextCmd != null ? nextCmd.code(loc3) : loc3);
+			return (nextCmd != null ? nextCmd.code(loc3, routine) : loc3);
 		}
 	}
 
@@ -1058,14 +1057,14 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(final int loc) throws CodeTooSmallError {
-			int loc1 = expression.code(loc);
-			int loc2 = cmd.code(loc1 + 1);
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
+			int loc1 = expression.code(loc, routine);
+			int loc2 = cmd.code(loc1 + 1, routine);
 			// Compiler.getVM().CondJump(loc1, loc2 + 1);
 			// Compiler.getVM().UncondJump(loc2, loc);
 			Compiler.getcodeArray().put(loc1, new CondJump(loc2 + 1));
 			Compiler.getcodeArray().put(loc2, new UncondJump(loc));
-			return (nextCmd != null ? nextCmd.code(loc2 + 1) : (loc2 + 1));
+			return (nextCmd != null ? nextCmd.code(loc2 + 1, routine) : (loc2 + 1));
 		}
 	}
 
@@ -1151,11 +1150,11 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(final int loc) throws CodeTooSmallError {
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			int loc1 = loc;
-			loc1 = routineCall.getExprList().code(loc1);
+			loc1 = routineCall.getExprList().code(loc1, routine);
 			Compiler.getRoutineTable().getRoutine(routineCall.getIdent().getValue()).addCall(loc1++);
-			return (nextCmd != null ? nextCmd.code(loc1) : loc1);
+			return (nextCmd != null ? nextCmd.code(loc1, routine) : loc1);
 		}
 	}
 
@@ -1215,16 +1214,16 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(final int loc) throws CodeTooSmallError {
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			int loc1;
 			if (expr instanceof ExprDyadic && ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT) {
 				ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
 				expr = expr1;
-				loc1 = ((ExprStore) expr).codeRef(loc, true, false); // TODO
+				loc1 = ((ExprStore) expr).codeRef(loc, true, false, routine); // TODO
 			} else if (expr instanceof ExprArray) {
-				loc1 = ((ExprArray) expr).codeRef(loc);
+				loc1 = ((ExprArray) expr).codeRef(loc, routine);
 			} else {
-				loc1 = ((ExprStore) expr).codeRef(loc, true, false); // TODO
+				loc1 = ((ExprStore) expr).codeRef(loc, true, false, routine); // TODO
 			}
 
 			if (type.getValue() == TypeAttribute.BOOL) {
@@ -1251,7 +1250,7 @@ public interface AbsTree {
 				// Compiler.getcodeArray().put(loc1++, new
 				// OutputInt(((ExprStore) expr).getIdent().getValue()));
 			}
-			return (nextCmd != null ? nextCmd.code(loc1) : loc1);
+			return (nextCmd != null ? nextCmd.code(loc1, routine) : loc1);
 		}
 	}
 
@@ -1311,7 +1310,7 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(final int loc) throws CodeTooSmallError {
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			int loc1;
 			if (expr instanceof ExprDyadic && ((ExprDyadic) expr).getOperator().getValue() == OperatorAttribute.DOT) {
 				ExprStore expr1 = (ExprStore) ((ExprDyadic) expr).getExpr1();
@@ -1320,11 +1319,11 @@ public interface AbsTree {
 						.getStore(expr2.getIdent().getValue() + "." + expr1.getIdent().getValue());
 				expr1.setIdent(store.getType().getIdent());
 				expr = expr1;
-				loc1 = expr.code(loc);
+				loc1 = expr.code(loc, routine);
 			} else if (expr instanceof ExprArray) {
-				loc1 = ((ExprArray) expr).code(loc);
+				loc1 = ((ExprArray) expr).code(loc, routine);
 			} else {
-				loc1 = ((ExprStore) expr).code(loc);
+				loc1 = ((ExprStore) expr).code(loc, routine);
 				Compiler.getcodeArray().put(loc1++, new Deref());
 			}
 
@@ -1352,7 +1351,7 @@ public interface AbsTree {
 				// Compiler.getcodeArray().put(loc1++, new
 				// OutputInt(((ExprStore) expr).getIdent().getValue()));
 			}
-			return (nextCmd != null ? nextCmd.code(loc1) : loc1);
+			return (nextCmd != null ? nextCmd.code(loc1, routine) : loc1);
 		}
 	}
 
@@ -1448,7 +1447,7 @@ public interface AbsTree {
 
 		abstract String getValue();
 
-		abstract int code(int loc) throws CodeTooSmallError;
+		abstract int code(int loc, boolean routine) throws CodeTooSmallError;
 
 		abstract int getLine();
 	}
@@ -1613,7 +1612,7 @@ public interface AbsTree {
 
 		}
 
-		public int code(int loc) throws CodeTooSmallError {
+		public int code(int loc, boolean routine) throws CodeTooSmallError {
 			/*
 			 * TypedIdent type = Compiler.getScope().getType(ident.getValue());
 			 * if (type instanceof TypedIdentArr) { Range range = (Range)
@@ -1629,9 +1628,9 @@ public interface AbsTree {
 			Compiler.getcodeArray().put(loc, new LoadAddrRel(getArrayAdress(this.ident.getValue())));
 			int loc1 = loc + 1;
 			if (this.expression instanceof ExprStore){
-			    loc1 = ((ExprStore)this.expression).codeRef(loc1, true , true);
+			    loc1 = ((ExprStore)this.expression).codeRef(loc1, true , true, routine);
 			}else{
-			    loc1 = this.expression.code(loc1);
+			    loc1 = this.expression.code(loc1, routine);
 			}
 			// Compiler.getcodeArray().put(loc+1,new LoadImInt(new
 			// Integer(((ExprArray)targetExpression).expression.getValue()).intValue()));
@@ -1644,7 +1643,7 @@ public interface AbsTree {
 			return loc1;
 		}
 
-		public int codeRef(int loc) throws CodeTooSmallError {
+		public int codeRef(int loc, boolean routine) throws CodeTooSmallError {
 			/*
 			 * TypedIdent type = Compiler.getScope().getType(ident.getValue());
 			 * if (type instanceof TypedIdentArr) { Range range = (Range)
@@ -1660,9 +1659,9 @@ public interface AbsTree {
 			Compiler.getcodeArray().put(loc, new LoadAddrRel(getArrayAdress(this.ident.getValue())));
 			int loc1 = loc + 1;
 			if(this.expression instanceof ExprStore){
-			    loc1 = ((ExprStore)this.expression).codeRef(loc1, true, true);
+			    loc1 = ((ExprStore)this.expression).codeRef(loc1, true, true, routine);
 			}else{
-			    loc1 = this.expression.code(loc1);
+			    loc1 = this.expression.code(loc1, routine);
 			}		
 			// Compiler.getcodeArray().put(loc+1,new LoadImInt(new
 			// Integer(((ExprArray)targetExpression).expression.getValue()).intValue()));
@@ -1713,7 +1712,7 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(final int loc) throws CodeTooSmallError {
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			// Compiler.getVM().IntLoad(loc, literal.getLiteral());
 			Compiler.getcodeArray().put(loc, new LoadImInt(literal.getLiteral()));
 			return loc + 1;
@@ -1826,22 +1825,34 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(final int loc) throws CodeTooSmallError {
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
-			if (Compiler.getIdentTable().containsKey(ident.getValue())) {
-				Compiler.getcodeArray().put(loc,
-						new LoadAddrRel(Compiler.getIdentTable().get(ident.getValue()).intValue()));
-				return loc + 1;
-			} else {
-				Compiler.addIdentTable(ident.getValue(), loc);
-				return ((store != null) ? store.codeLoad(loc) : loc);
-			}
+			int loc1 = loc;
+            if (routine) {
+                if (Compiler.getprocIdentTable().containsKey(ident.getValue())) {
+                    //Compiler.getcodeArray().put(loc, new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident.getValue())[0])));
+                    loc1 = store.codeRef(loc, true, false, routine);
+                    return loc1;
+                } else {
+                    Compiler.addIdentTable(ident.getValue(), loc);
+                    return ((store != null) ? store.codeLoad(loc, routine) : loc);
+                }
+            } else {
+                if (Compiler.getIdentTable().containsKey(ident.getValue())) {
+                    Compiler.getcodeArray().put(loc,
+                            new LoadAddrRel(Compiler.getIdentTable().get(ident.getValue()).intValue()));
+                    return loc + 1;
+                } else {
+                    Compiler.addIdentTable(ident.getValue(), loc);
+                    return ((store != null) ? store.codeLoad(loc, routine) : loc);
+                }
+            }
 
 		}
 
-		public int codeRef(final int loc, boolean rel, boolean ref) throws CodeTooSmallError {
+		public int codeRef(final int loc, boolean rel, boolean ref, boolean routine) throws CodeTooSmallError {
 			Store store = (Store) Compiler.getScope().getStoreTable().getStore(ident.getValue());
-			return ((store != null) ? store.codeRef(loc, rel, ref) : loc);
+			return ((store != null) ? store.codeRef(loc, rel, ref, routine) : loc);
 		}
 	}
 
@@ -1871,7 +1882,7 @@ public interface AbsTree {
 		}
 
 		@Override
-		int code(int loc) throws CodeTooSmallError { // TODO
+		int code(int loc, boolean routine) throws CodeTooSmallError { // TODO
 		    
 			return 0;
 		}
@@ -1919,7 +1930,7 @@ public interface AbsTree {
 		}
 
 		@Override
-		int code(int loc) {
+		int code(int loc, boolean routine) {
 			// TODO Auto-generated method stub
 			return 0;
 		}
@@ -2088,21 +2099,21 @@ public interface AbsTree {
 		}
 
 		@Override
-		public int code(final int loc) throws CodeTooSmallError {
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			int loc1;
 
 			if (expr1 instanceof ExprStore) {
-				loc1 = ((ExprStore) expr1).codeRef(loc, true, true);
+				loc1 = ((ExprStore) expr1).codeRef(loc, true, true, routine);
 			} else {
-				loc1 = expr1.code(loc);
+				loc1 = expr1.code(loc, routine);
 			}
 
 			if (operator.getValue() != OperatorAttribute.CAND && operator.getValue() != OperatorAttribute.COR) {
 
 				if (expr2 instanceof ExprStore) {
-					loc1 = ((ExprStore) expr2).codeRef(loc1, true, true);
+					loc1 = ((ExprStore) expr2).codeRef(loc1, true, true, routine);
 				} else {
-					loc1 = expr2.code(loc1);
+					loc1 = expr2.code(loc1, routine);
 				}
 
 				switch (operator.getValue()) {
@@ -2158,7 +2169,7 @@ public interface AbsTree {
 
 				return loc1 + 1;
 			} else if (operator.getValue() == OperatorAttribute.CAND) {
-				int loc2 = expr2.code(loc1 + 1);
+				int loc2 = expr2.code(loc1 + 1, routine);
 				// Compiler.getVM().UncondJump(loc2++, loc2 + 1);
 				// Compiler.getVM().CondJump(loc1, loc2);
 				// Compiler.getVM().IntLoad(loc2++, 0);
@@ -2167,7 +2178,7 @@ public interface AbsTree {
 				Compiler.getcodeArray().put(loc2++, new LoadImInt(0));
 				return loc2;
 			} else {
-				int loc2 = expr2.code(loc1 + 2);
+				int loc2 = expr2.code(loc1 + 2, routine);
 				// Compiler.getVM().UncondJump(loc2++, loc2 + 1);
 				// Compiler.getVM().CondJump(loc1, loc1 + 2);
 				// Compiler.getVM().UncondJump(loc1 + 1, loc2);
@@ -2321,20 +2332,20 @@ public interface AbsTree {
 				expressionList.check(paramList, aliasList, canInit);
 		}
 
-		public int code(final int loc) throws CodeTooSmallError {
+		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			int loc1;
 			if (param.getMechMode().getValue() == ModeAttributes.COPY) {
 				if(expression instanceof ExprStore){
-				    loc1 = ((ExprStore) expression).codeRef(loc, true, true);
+				    loc1 = ((ExprStore) expression).codeRef(loc, true, true, routine);
 				}else{
-				    loc1 = expression.code(loc);   
+				    loc1 = expression.code(loc, routine);   
 				}
 			} else {
-				loc1 = ((ExprStore) expression).codeRef(loc, true, false); // TODO
+				loc1 = ((ExprStore) expression).codeRef(loc, true, false, routine); // TODO
 																			// implementierung
 			}
 
-			return (expressionList != null ? expressionList.code(loc1) : loc1);
+			return (expressionList != null ? expressionList.code(loc1, routine) : loc1);
 		}
 	}
 

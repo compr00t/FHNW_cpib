@@ -7,12 +7,15 @@ global
 		// Store q is not initialized
 		// q := 0;
 	
-		q init := 0 + 1;
+		q init := 0;
 		r init := m;
 		while r >= n do
 			q := q + 1;
 			r := r - n
-		endwhile
+		endwhile;
+		
+		debugout q;
+		debugout r
 	endproc;
 	
 	// Routine already declared: divide
@@ -41,16 +44,18 @@ do
 	// Index out of bound exception for array x
 	// n := 4 - m + 3 + [11]x;
 	// [-9]x := m + 2 * 3;
+	q init := 0;
+	r init := 25;
 	
-	n := 4 - m + 3 + [4]x;
-	[-2]x := m + 2 * 3;
-	[-1]x := [-2]x;
-	[0]x := [-1]x + 2 + [-2]x;
+	//n := 4 - m + 3 + [4]x;
+	[-2]x := 5;
+	//[-1]x := [-2]x;
+	//[0]x := [-1]x + 2 + [-2]x;
 	
 	// Ident y not declared
 	// call divide(m, [5]y, q init, r init);
 	
-	call divide(m, [-2]x, q init, r init);
+	call divide(m, [-2]x, q, r);
 	debugout q;
 	debugout r
 endprogram
