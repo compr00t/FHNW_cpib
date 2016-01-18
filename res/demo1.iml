@@ -4,21 +4,37 @@ global
 	var start:int64;
 	var end:int64;
 	var count:int64;
+	var holder:int64;
 	
-	var [-3:3]unsorted:int64;
-	var [-3:3]sorted:int64
+	var [-3:3]input:int64;
+	var [-3:3]output:int64
 
 do
 
 	start init := -3;
 	end init := 3;
+	holder init := 0;
+	
 		
 	// counter setzen
 	count init := start;
 	
 	// abfüllen
 	while end >= count do
-		debugin [count]unsorted;
+		debugin [count]input;
+		count := count + 1
+	endwhile;
+	
+	// counter setzen
+	count := start;
+	
+	// verändern
+	while end >= count do
+		if [count]input < 10 then
+			[count]output := [count]input * 100
+		else
+			[count]output := [count]input
+		endif;
 		count := count + 1
 	endwhile;
 	
@@ -27,7 +43,7 @@ do
 	
 	// ausgeben
 	while end >= count do
-		debugout [count]unsorted;
+		debugout [count]output;
 		count := count + 1
 	endwhile
 endprogram
