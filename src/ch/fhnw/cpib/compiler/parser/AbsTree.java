@@ -316,7 +316,8 @@ public interface AbsTree {
                 }
                 i += 1;
             }
-            returnDecl.code(loc1);
+            Compiler.getprocIdentTable().put(returnDecl.typedIdent.getIdent().getValue(), new String[] {(0- routine.getParamList().size() - 1) +"","REF"});
+            //returnDecl.code(loc1);
             //LoadAddrRel of Variables.
             // Compiler.getVM().Enter(loc1++, routine.getInOutCopyCount() +
             // getCount(), 0);
@@ -325,7 +326,7 @@ public interface AbsTree {
             loc1 = cmd.code(loc1, true);
             //loc1 = param.codeOut(loc1, routine.getParamList().size(), 0);
             // Compiler.getVM().Return(loc1++, 0);
-            Compiler.getcodeArray().put(loc1, new Return(1 + 1));
+            Compiler.getcodeArray().put(loc1, new Return(1));
             //Compiler.setScope(null);
             return ++loc1;
             // return (nextDecl!=null?nextDecl.code(loc1):loc1);
@@ -1945,8 +1946,11 @@ public interface AbsTree {
 
 		@Override
 		int code(int loc, boolean routine) throws CodeTooSmallError { // TODO
-		    
-			return 0;
+		    int loc1 = loc;
+            Compiler.getcodeArray().put(loc1++, new AllocBlock(1));
+            loc1 = routineCall.getExprList().code(loc1, routine);
+            Compiler.getRoutineTable().getRoutine(routineCall.getIdent().getValue()).addCall(loc1++);
+            return loc1;
 		}
 
 		@Override
@@ -2162,21 +2166,28 @@ public interface AbsTree {
 
 		@Override
 		public int code(final int loc, boolean routine) throws CodeTooSmallError {
-			int loc1;
+		    int loc1;
 
-			if (expr1 instanceof ExprStore) {
-				loc1 = ((ExprStore) expr1).codeRef(loc, true, true, routine);
-			} else {
-				loc1 = expr1.code(loc, routine);
-			}
+            if (expr1 instanceof ExprStore) {
+                loc1 = ((ExprStore) expr1).codeRef(loc, true, true, routine);
+            } else if (expr1 instanceof ExprFunCall) {
+                loc1 = ((ExprFunCall) expr1).code(loc, routine);
+            } else {
 
-			if (operator.getValue() != OperatorAttribute.CAND && operator.getValue() != OperatorAttribute.COR) {
+                loc1 = expr1.code(loc, routine);
+            }
 
-				if (expr2 instanceof ExprStore) {
-					loc1 = ((ExprStore) expr2).codeRef(loc1, true, true, routine);
-				} else {
-					loc1 = expr2.code(loc1, routine);
-				}
+
+            if (operator.getValue() != OperatorAttribute.CAND && operator.getValue() != OperatorAttribute.COR) {
+
+                if (expr2 instanceof ExprStore) {
+                    loc1 = ((ExprStore) expr2).codeRef(loc1, true, true, routine);
+                } else if (expr1 instanceof ExprFunCall) {
+                    loc1 = ((ExprFunCall) expr1).code(loc, routine);
+                } else {
+
+                    loc1 = expr2.code(loc1, routine);
+                }
 
 				switch (operator.getValue()) {
 				case DOT:
@@ -2396,14 +2407,18 @@ public interface AbsTree {
 
 		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			int loc1;
-			if (param.getMechMode().getValue() == ModeAttributes.COPY) {
-				if(expression instanceof ExprStore){
-				    loc1 = ((ExprStore) expression).codeRef(loc, true, true, routine);
-				}else{
-				    loc1 = expression.code(loc, routine);   
-				}
-			} else {
-				loc1 = ((ExprStore) expression).codeRef(loc, true, false, routine); // TODO
+            if (param == null) {
+                loc1 = expression.code(loc, routine);
+                return (expressionList != null ? expressionList.code(loc1, routine) : loc1);
+            }
+            if (param != null && param.getMechMode().getValue() == ModeAttributes.COPY) {
+                if (expression instanceof ExprStore) {
+                    loc1 = ((ExprStore) expression).codeRef(loc, true, true, routine);
+                } else {
+                    loc1 = expression.code(loc, routine);
+                }
+            } else {
+                loc1 = ((ExprStore) expression).codeRef(loc, true, false, routine); // TODO
 																			// implementierung
 			}
 
