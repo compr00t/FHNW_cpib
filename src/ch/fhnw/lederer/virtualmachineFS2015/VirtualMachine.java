@@ -278,7 +278,8 @@ public class VirtualMachine implements IVirtualMachine {
         public void execute()
         {
             sp= sp - 1;
-            System.out.println(sp);
+            // TODO really needed?
+            //System.out.println(sp);
             store[sp-1]= Data.intGT(store[sp-1], store[sp]);
             pc= pc + 1;
         }
@@ -297,7 +298,8 @@ public class VirtualMachine implements IVirtualMachine {
         public void execute()
         {
             sp= sp - 1;
-            System.out.println(sp);
+            // TODO really needed?
+            //System.out.println(sp);
             store[sp-1]= Data.intGE(store[sp-1], store[sp]);
             pc= pc + 1;
         }
