@@ -10,10 +10,15 @@ global
 		endif
  	endfun;
 	
-	var a:int64
+	var a:int64;
+	var [0:1]store:int64
 
 do
 	debugin a init;
-	a := fib(a);
-	debugout a
+	
+	[0]store := a;
+	[1]store := fib(a);
+	
+	debugout [0]store;
+	debugout [1]store
 endprogram
