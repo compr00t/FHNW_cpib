@@ -4,13 +4,18 @@ global
 	var start:int64;
 	var end:int64;
 	var count:int64;
+	var holder:int64;
+	var size:int64;
 	
-	var [-3:3]input:int64;
-	var [-3:3]output:int64
+	var [0:3]input:int64
 
 do
-	start init := -3;
+
+	start init := 0;
 	end init := 3;
+	holder init := 0;
+	size init := 0;
+	
 		
 	// counter setzen
 	count init := start;
@@ -26,20 +31,12 @@ do
 	
 	// verändern
 	while end >= count do
-		if [count]input < 10 then
-			[count]output := [count]input * 100
-		else
-			[count]output := [count]input
-		endif;
-		count := count + 1
+		holder := holder + [count]input;
+		count := count + 1;
+		size := size + 1
 	endwhile;
 	
-	// counter setzen
-	count := start;
-	
 	// ausgeben
-	while end >= count do
-		debugout [count]output;
-		count := count + 1
-	endwhile
+	holder := holder div size;
+	debugout holder
 endprogram

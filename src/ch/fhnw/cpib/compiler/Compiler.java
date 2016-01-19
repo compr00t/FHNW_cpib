@@ -161,8 +161,9 @@ public final class Compiler {
             //InputStreamReader source = new InputStreamReader(new FileInputStream("res/code.iml"));
             //InputStreamReader source = new InputStreamReader(new FileInputStream("res/varia.iml"));
             //InputStreamReader source = new InputStreamReader(new FileInputStream("res/demo1.iml"));
+        	InputStreamReader source = new InputStreamReader(new FileInputStream("res/demo2.iml"));
             //InputStreamReader source = new InputStreamReader(new FileInputStream("res/recurrsion.iml"));
-            InputStreamReader source = new InputStreamReader(new FileInputStream("res/recurrsionProc.iml"));
+            //InputStreamReader source = new InputStreamReader(new FileInputStream("res/recurrsionProc.iml"));
             Compiler.compile(new BufferedReader(source));
 
         } catch (Exception e) {
