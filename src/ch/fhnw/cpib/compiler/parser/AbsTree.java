@@ -1942,7 +1942,23 @@ public interface AbsTree {
 
 		@Override
 		Object checkR() throws ContextError {
-			return null;
+		    Ident ident = routineCall.getIdent();
+            RoutineTypes type = Compiler.getRoutineTable().getType(ident.getValue());
+            if (type == null) {
+                throw new ContextError("Ident " + ident.getValue() + " not declared", ident.getLine());
+            } else if (type != RoutineTypes.FUNCTION) {
+                throw new ContextError("Function call " + ident.getValue() + " found in left part of an assignement",
+                        ident.getLine());
+            }
+
+            Routine routine = Compiler.getRoutineTable().getRoutine(ident.getValue());
+
+            List<ch.fhnw.cpib.compiler.context.Parameter> paramList = new ArrayList<ch.fhnw.cpib.compiler.context.Parameter>(
+                    routine.getParamList());
+            Set<String> aliasList = new HashSet<String>();
+            routineCall.getExprList().check(paramList, aliasList, false);
+            
+            return new Type(TypeAttribute.INT64);
 		}
 
 		@Override
