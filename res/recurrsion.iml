@@ -13,7 +13,7 @@ global
 	var a:int64
 
 do
-	a init := 13;	
+	debugin a init;
 	a := fib(a);
 	debugout a
 endprogram
