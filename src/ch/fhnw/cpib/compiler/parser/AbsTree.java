@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 
+
 //import ch.fhnw.cpib.compiler.parser.ConcTree.RangeVal;
 import ch.fhnw.cpib.compiler.scanner.enums.ModeAttributes;
 import ch.fhnw.cpib.compiler.scanner.enums.OperatorAttribute;
@@ -30,7 +31,6 @@ import ch.fhnw.lederer.virtualmachineFS2015.CodeArray;
 import ch.fhnw.lederer.virtualmachineFS2015.ICodeArray;
 import ch.fhnw.lederer.virtualmachineFS2015.ICodeArray.CodeTooSmallError;
 import ch.fhnw.lederer.virtualmachineFS2015.IInstructions;
-import ch.fhnw.lederer.virtualmachineFS2015.IInstructions.IInstr;
 import ch.fhnw.lederer.virtualmachineFS2015.IInstructions.*;
 
 public interface AbsTree {
@@ -1894,8 +1894,14 @@ public interface AbsTree {
             if (routine) {
                 if (Compiler.getprocIdentTable().containsKey(ident.getValue())) {
                     //Compiler.getcodeArray().put(loc, new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident.getValue())[0])));
-                    loc1 = store.codeRef(loc, true, false, routine);
-                    return loc1;
+                    if(store==null){
+                        Compiler.getcodeArray().put(loc1++, new LoadAddrRel(Integer.parseInt(Compiler.getprocIdentTable().get(ident.getValue())[0])));
+                        return loc1;
+                    }else{
+                        loc1 = store.codeRef(loc, true, false, routine);
+                        return loc1; 
+                    }
+                    
                 } else {
                     Compiler.addIdentTable(ident.getValue(), loc);
                     return ((store != null) ? store.codeLoad(loc, routine) : loc);
@@ -1947,7 +1953,7 @@ public interface AbsTree {
 		@Override
 		int code(int loc, boolean routine) throws CodeTooSmallError { // TODO
 		    int loc1 = loc;
-            Compiler.getcodeArray().put(loc1++, new AllocBlock(1));
+            Compiler.getcodeArray().put(loc1++, new AllocBlock(1)); //referenz neu spechern?
             loc1 = routineCall.getExprList().code(loc1, routine);
             Compiler.getRoutineTable().getRoutine(routineCall.getIdent().getValue()).addCall(loc1++);
             return loc1;
@@ -2182,8 +2188,8 @@ public interface AbsTree {
 
                 if (expr2 instanceof ExprStore) {
                     loc1 = ((ExprStore) expr2).codeRef(loc1, true, true, routine);
-                } else if (expr1 instanceof ExprFunCall) {
-                    loc1 = ((ExprFunCall) expr1).code(loc, routine);
+                } else if (expr2 instanceof ExprFunCall) {
+                    loc1 = ((ExprFunCall) expr2).code(loc1, routine);
                 } else {
 
                     loc1 = expr2.code(loc1, routine);
@@ -2407,10 +2413,10 @@ public interface AbsTree {
 
 		public int code(final int loc, boolean routine) throws CodeTooSmallError {
 			int loc1;
-            if (param == null) {
+            /*if (param == null) {
                 loc1 = expression.code(loc, routine);
                 return (expressionList != null ? expressionList.code(loc1, routine) : loc1);
-            }
+            }*/
             if (param != null && param.getMechMode().getValue() == ModeAttributes.COPY) {
                 if (expression instanceof ExprStore) {
                     loc1 = ((ExprStore) expression).codeRef(loc, true, true, routine);
@@ -2418,8 +2424,17 @@ public interface AbsTree {
                     loc1 = expression.code(loc, routine);
                 }
             } else {
-                loc1 = ((ExprStore) expression).codeRef(loc, true, false, routine); // TODO
-																			// implementierung
+                if(param==null){
+                    if(expression instanceof ExprStore){
+                        loc1 = ((ExprStore) expression).codeRef(loc, true, true, routine);
+                    }else{
+                        loc1 = expression.code(loc, routine);
+                    }
+                    
+                }else{
+                    loc1 = ((ExprStore) expression).codeRef(loc, true, false, routine); // TODO
+                }
+                
 			}
 
 			return (expressionList != null ? expressionList.code(loc1, routine) : loc1);

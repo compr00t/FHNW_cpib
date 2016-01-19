@@ -7,14 +7,13 @@ global
 			r init := a
 		else
 			r init := fib(a - 1) + fib(a - 2)
-		endif; 
-		debugout a
+		endif
  	endfun;
 	
 	var a:int64
 
 do
 	a init := 13;	
-	a := fibonacciRek(a);
+	a := fib(a);
 	debugout a
 endprogram
